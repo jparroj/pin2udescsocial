@@ -16,6 +16,7 @@ import java.util.List;
 
 @Repository
 public interface MuralRepository extends JpaRepository<Mural, Long> {
+    @Override
     List<Mural> findAll();
     Long Add(Mural mural);
 }

@@ -1,8 +1,8 @@
 /**
- * Classe CaronaController
+ * Classe MuralController
  * 
- * Author: Elian
- * Data: 2025-05-15
+ * Usuario: Lucas Eduardo
+
  */
 package br.udesc.udescsocial.backend.controller;
 

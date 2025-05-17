@@ -86,6 +86,8 @@ public class AnuncioController {
                     .body("Erro ao criar anúncio: " + ex.getMessage());
         }
     }
+
+    
     
     // Obter anúncio por ID
     @GetMapping("/{id}")

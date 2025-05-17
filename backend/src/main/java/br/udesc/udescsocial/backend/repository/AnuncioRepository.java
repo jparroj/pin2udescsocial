@@ -9,9 +9,9 @@ import java.util.List;
 public interface AnuncioRepository extends JpaRepository<Anuncio, Long> {
     
     @Query("SELECT a FROM Anuncio a WHERE " +
-           "(:#{#tipo == null} = true OR a.tipo = :tipo) " +
-           "ORDER BY a.dataPublicacao DESC")
-    List<Anuncio> findWithFilters(@Param("tipo") String tipo);
+       "(:tipo IS NULL OR a.tipo = :tipo) " +
+       "ORDER BY a.dataPublicacao DESC")
+List<Anuncio> findWithFilters(@Param("tipo") String tipo);
     
     List<Anuncio> findByAutorId(Long autorId);
 }

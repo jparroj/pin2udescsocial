@@ -11,14 +11,14 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-@RestController
-@RequestMapping("/anuncios")
-@CrossOrigin(origins = "*")
+@RestController//Indica que esta classe é um controller REST
+@RequestMapping("/anuncios")//Define que todas as rotas começam com /anuncios
+@CrossOrigin(origins = "*")//Permite requisições de qualquer origem
 public class AnuncioController {
     
-    private final AnuncioRepository anuncioRepository;
-    private final UsuarioRepository usuarioRepository;
-    private final AnuncioFotoRepository anuncioFotoRepository;
+    private final AnuncioRepository anuncioRepository;//Para operações com anúncios
+    private final UsuarioRepository usuarioRepository;// Para validar autores dos anúncios
+    private final AnuncioFotoRepository anuncioFotoRepository;//Para gerenciar fotos dos anúncios
     
     public AnuncioController(AnuncioRepository anuncioRepository, 
                            UsuarioRepository usuarioRepository,
@@ -28,8 +28,8 @@ public class AnuncioController {
         this.anuncioFotoRepository = anuncioFotoRepository;
     }
     
-    // Listar todos os anúncios com filtros
-    @GetMapping
+   
+    @GetMapping // Permite filtrar/Listar anúncios por tipo -> GET /anuncios
     public ResponseEntity<?> listarAnuncios(
         @RequestParam(required = false) String tipo) {
         
@@ -49,28 +49,28 @@ public class AnuncioController {
         }
     }
     
-    // Criar novo anúncio
-    @PostMapping
+    
+    @PostMapping// Criar novo anúncio -> POST /anuncios
     public ResponseEntity<?> criarAnuncio(@RequestBody CriarAnuncioRequest request) {
         try {
             Optional<Usuario> autorOpt = usuarioRepository.findById(request.autorId());
-            if (autorOpt.isEmpty()) {
+            if (autorOpt.isEmpty()) {//Valida se o autor existe
                 return ResponseEntity.badRequest().body("Autor não encontrado");
             }
             
-            Anuncio anuncio = new Anuncio();
+            Anuncio anuncio = new Anuncio();//Cria um novo anúncio com data atual
             anuncio.setAutor(autorOpt.get());
-            anuncio.setTitulo(request.titulo()); // Campo título adicionado
+            anuncio.setTitulo(request.titulo());
             anuncio.setTipo(request.tipo());
             anuncio.setDescricao(request.descricao());
             anuncio.setLocal(request.local());
             anuncio.setQuantidade(request.quantidade());
-            anuncio.setDataPublicacao(LocalDate.now());
+            anuncio.setDataPublicacao(LocalDate.now());//dataatual
             
             Anuncio savedAnuncio = anuncioRepository.save(anuncio);
             
-            // Salvar fotos se houver
-            if (request.fotos() != null && !request.fotos().isEmpty()) {
+            
+            if (request.fotos() != null && !request.fotos().isEmpty()) {// Salvar fotos se houver
                 for (String urlFoto : request.fotos()) {
                     AnuncioFoto foto = new AnuncioFoto();
                     foto.setAnuncio(savedAnuncio);
@@ -89,8 +89,8 @@ public class AnuncioController {
 
     
     
-    // Obter anúncio por ID
-    @GetMapping("/{id}")
+   
+    @GetMapping("/{id}") // Busca um anúncio específico pelo ID (GET /anuncios/{id})
     public ResponseEntity<?> obterAnuncio(@PathVariable Long id) {
         Optional<Anuncio> anuncioOpt = anuncioRepository.findById(id);
         if (anuncioOpt.isEmpty()) {
@@ -99,8 +99,8 @@ public class AnuncioController {
         return ResponseEntity.ok(anuncioOpt.get());
     }
     
-    // Listar anúncios de um usuário específico
-    @GetMapping("/usuario/{usuarioId}")
+    
+    @GetMapping("/usuario/{usuarioId}")// Listar anúncios de um usuário específico (GET /anuncios/usuario/{usuarioId})
     public ResponseEntity<?> listarAnunciosPorUsuario(@PathVariable Long usuarioId) {
         if (!usuarioRepository.existsById(usuarioId)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -111,8 +111,8 @@ public class AnuncioController {
         return ResponseEntity.ok(anuncios);
     }
     
-    // Atualizar anúncio
-    @PutMapping("/{id}")
+    
+    @PutMapping("/{id}")// Atualizar anúncio (PUT /anuncios/{id})
     public ResponseEntity<?> atualizarAnuncio(
             @PathVariable Long id,
             @RequestBody AtualizarAnuncioRequest request) {
@@ -151,8 +151,7 @@ public class AnuncioController {
         }
     }
     
-    // Deletar anúncio
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id}")//Deletar Anúncio (DELETE /anuncios/{id})
     public ResponseEntity<Void> deletarAnuncio(@PathVariable Long id) {
         if (!anuncioRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
@@ -162,8 +161,7 @@ public class AnuncioController {
         return ResponseEntity.noContent().build();
     }
     
-    // Compartilhar anúncio
-    @PostMapping("/{id}/compartilhar")
+    @PostMapping("/{id}/compartilhar") //Compartilhar Anúncio (POST /anuncios/{id}/compartilhar)
     public ResponseEntity<String> compartilharAnuncio(@PathVariable Long id) {
         if (!anuncioRepository.existsById(id)) {
             return ResponseEntity.notFound().build();

@@ -15,3 +15,16 @@ List<Anuncio> findWithFilters(@Param("tipo") String tipo);
     
     List<Anuncio> findByAutorId(Long autorId);
 }
+/*
+Por estender JpaRepository, esta interface já possui muitos métodos prontos, incluindo:
+
+save(Anuncio): Salva ou atualiza um anúncio
+
+findById(Long): Busca um anúncio por ID
+
+findAll(): Retorna todos os anúncios
+
+deleteById(Long): Remove um anúncio por ID
+
+count(): Retorna o total de anúncios
+ */

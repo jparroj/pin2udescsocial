@@ -30,6 +30,11 @@ public class LoginController {
             return ResponseEntity.badRequest().body(new LoginResponse("Credenciais inválidas!"));
         }
     }
+    @GetMapping
+        public ResponseEntity<?> listarTodosUsuarios() {
+        return ResponseEntity.ok(repository.findAll());
+    }
+
 }
 
 class LoginRequest {

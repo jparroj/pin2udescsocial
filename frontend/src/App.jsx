@@ -1,9 +1,8 @@
 // src/App.jsx
-import { useState } from "react";
-import Login from "./pages/Login"; // <-- importante o caminho
+import LoginPage from './pages/LoginPage';
 
 function App() {
-    return <h1>Testando React</h1>;
-  }
-  export default App;
-  
+  return <LoginPage />;
+}
+
+export default App;

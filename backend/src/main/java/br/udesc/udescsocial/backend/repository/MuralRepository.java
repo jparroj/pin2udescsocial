@@ -16,7 +16,10 @@ import java.util.List;
 
 @Repository
 public interface MuralRepository extends JpaRepository<Mural, Long> {
-    @Override
-    List<Mural> findAll();
-    Long Add(Mural mural);
+
+// Listar todos os murais por data de publicação, os mais recentes vem primeiro.
+List<Mural> findAllByOrderByDataPublicacaoDesc();
+
+ // Listar murais pelo Autor
+List<Mural> findByAutorUsuarioIdOrderByDataPublicacaoDesc(Long autorId);
 }

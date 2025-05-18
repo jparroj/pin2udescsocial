@@ -1,10 +1,8 @@
 /**
  * Classe Mural
- * 
-Usuario: Lucas Eduardo
- 
+* Usuário Lucas Eduardo
+ * Data: 2025-05-16
  */
-
 package br.udesc.udescsocial.backend.entity;
 
 import jakarta.persistence.*;
@@ -12,20 +10,27 @@ import java.time.LocalDate;
 
 @Entity
 public class Mural {
-    @EmbeddedId
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @Column(nullable = false)
     private LocalDate dataPublicacao;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String titulo;
 
-    @Column(nullable = false)
-    private String categoria;
+    @Column(nullable = false, length = 50)
+    private String categoria; 
 
+    @Lob
     @Column(nullable = false)
     private String conteudo;
+
+    @ManyToOne
+    @JoinColumn(name = "autor_id", nullable = false)
+    private Professor autor;
 
     public Long getId() {
         return id;
@@ -65,6 +70,14 @@ public class Mural {
 
     public void setConteudo(String conteudo) {
         this.conteudo = conteudo;
+    }
+
+    public Professor getAutor() {
+        return autor;
+    }
+
+    public void setAutor(Professor autor) {
+        this.autor = autor;
     }
 
 }

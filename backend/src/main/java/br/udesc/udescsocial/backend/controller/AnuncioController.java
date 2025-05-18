@@ -151,15 +151,28 @@ public class AnuncioController {
         }
     }
     
-    @DeleteMapping("/{id}")//Deletar Anúncio (DELETE /anuncios/{id})
-    public ResponseEntity<Void> deletarAnuncio(@PathVariable Long id) {
+@DeleteMapping("/{id}")
+public ResponseEntity<?> deletarAnuncio(@PathVariable Long id) {
+    try {
+        // Verifica se o anúncio existe
         if (!anuncioRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Anúncio não encontrado com ID: " + id);
         }
+
+        // Primeiro deleta todas as fotos associadas
+        anuncioFotoRepository.deleteByAnuncioId(id);
         
+        // Depois deleta o anúncio
         anuncioRepository.deleteById(id);
+        
         return ResponseEntity.noContent().build();
+        
+    } catch (Exception ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Erro ao deletar anúncio: " + ex.getMessage());
     }
+}
     
     @PostMapping("/{id}/compartilhar") //Compartilhar Anúncio (POST /anuncios/{id}/compartilhar)
     public ResponseEntity<String> compartilharAnuncio(@PathVariable Long id) {

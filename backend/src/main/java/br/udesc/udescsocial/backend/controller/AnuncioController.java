@@ -6,6 +6,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
@@ -28,7 +29,6 @@ public class AnuncioController {
         this.anuncioFotoRepository = anuncioFotoRepository;
     }
     
-   
     @GetMapping // Permite filtrar/Listar anúncios por tipo -> GET /anuncios
     public ResponseEntity<?> listarAnuncios(
         @RequestParam(required = false) String tipo) {
@@ -49,8 +49,8 @@ public class AnuncioController {
         }
     }
     
-    
     @PostMapping// Criar novo anúncio -> POST /anuncios
+    @Transactional
     public ResponseEntity<?> criarAnuncio(@RequestBody CriarAnuncioRequest request) {
         try {
             Optional<Usuario> autorOpt = usuarioRepository.findById(request.autorId());
@@ -69,13 +69,14 @@ public class AnuncioController {
             
             Anuncio savedAnuncio = anuncioRepository.save(anuncio);
             
-            
             if (request.fotos() != null && !request.fotos().isEmpty()) {// Salvar fotos se houver
                 for (String urlFoto : request.fotos()) {
-                    AnuncioFoto foto = new AnuncioFoto();
-                    foto.setAnuncio(savedAnuncio);
-                    foto.setUrlImagem(urlFoto);
-                    anuncioFotoRepository.save(foto);
+                    if (urlFoto != null && !urlFoto.isBlank()) {
+                        AnuncioFoto foto = new AnuncioFoto();
+                        foto.setAnuncio(savedAnuncio);
+                        foto.setUrlImagem(urlFoto);
+                        anuncioFotoRepository.save(foto);
+                    }
                 }
             }
             
@@ -87,9 +88,6 @@ public class AnuncioController {
         }
     }
 
-    
-    
-   
     @GetMapping("/{id}") // Busca um anúncio específico pelo ID (GET /anuncios/{id})
     public ResponseEntity<?> obterAnuncio(@PathVariable Long id) {
         Optional<Anuncio> anuncioOpt = anuncioRepository.findById(id);
@@ -98,7 +96,6 @@ public class AnuncioController {
         }
         return ResponseEntity.ok(anuncioOpt.get());
     }
-    
     
     @GetMapping("/usuario/{usuarioId}")// Listar anúncios de um usuário específico (GET /anuncios/usuario/{usuarioId})
     public ResponseEntity<?> listarAnunciosPorUsuario(@PathVariable Long usuarioId) {
@@ -111,8 +108,8 @@ public class AnuncioController {
         return ResponseEntity.ok(anuncios);
     }
     
-    
     @PutMapping("/{id}")// Atualizar anúncio (PUT /anuncios/{id})
+    @Transactional
     public ResponseEntity<?> atualizarAnuncio(
             @PathVariable Long id,
             @RequestBody AtualizarAnuncioRequest request) {
@@ -126,21 +123,34 @@ public class AnuncioController {
             Anuncio anuncio = anuncioOpt.get();
             
             // Atualizar campos permitidos
-            if (request.titulo() != null) {
+            if (request.titulo() != null && !request.titulo().isBlank()) {
                 anuncio.setTitulo(request.titulo());
             }
-            if (request.descricao() != null) {
+            if (request.descricao() != null && !request.descricao().isBlank()) {
                 anuncio.setDescricao(request.descricao());
             }
-            if (request.local() != null) {
+            if (request.local() != null && !request.local().isBlank()) {
                 anuncio.setLocal(request.local());
             }
-            if (request.quantidade() != null) {
+            if (request.quantidade() != null && request.quantidade() > 0) {
                 anuncio.setQuantidade(request.quantidade());
             }
             
             // Atualizar fotos se fornecido
-            
+            if (request.fotos() != null) {
+                // Primeiro remove todas as fotos existentes
+                anuncioFotoRepository.deleteByAnuncioId(id);
+                
+                // Adiciona as novas fotos
+                for (String urlFoto : request.fotos()) {
+                    if (urlFoto != null && !urlFoto.isBlank()) {
+                        AnuncioFoto foto = new AnuncioFoto();
+                        foto.setAnuncio(anuncio);
+                        foto.setUrlImagem(urlFoto);
+                        anuncioFotoRepository.save(foto);
+                    }
+                }
+            }
             
             Anuncio updated = anuncioRepository.save(anuncio);
             return ResponseEntity.ok(updated);
@@ -152,13 +162,24 @@ public class AnuncioController {
     }
     
     @DeleteMapping("/{id}")//Deletar Anúncio (DELETE /anuncios/{id})
-    public ResponseEntity<Void> deletarAnuncio(@PathVariable Long id) {
-        if (!anuncioRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
+    @Transactional
+    public ResponseEntity<?> deletarAnuncio(@PathVariable Long id) {
+        try {
+            if (!anuncioRepository.existsById(id)) {
+                return ResponseEntity.notFound().build();
+            }
+            
+            // Primeiro deleta todas as fotos associadas
+            anuncioFotoRepository.deleteByAnuncioId(id);
+            
+            // Depois deleta o anúncio
+            anuncioRepository.deleteById(id);
+            
+            return ResponseEntity.noContent().build();
+        } catch (Exception ex) {
+            return ResponseEntity.internalServerError()
+                    .body("Erro ao deletar anúncio: " + ex.getMessage());
         }
-        
-        anuncioRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
     }
     
     @PostMapping("/{id}/compartilhar") //Compartilhar Anúncio (POST /anuncios/{id}/compartilhar)

@@ -1,8 +1,8 @@
-// src/main/java/br/udesc/udescsocial/backend/controller/LoginController.java
 package br.udesc.udescsocial.backend.controller;
 
 import br.udesc.udescsocial.backend.entity.Usuario;
 import br.udesc.udescsocial.backend.repository.UsuarioRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,28 +19,57 @@ public class LoginController {
 
     @PostMapping
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
-        String email = loginRequest.getEmail();
-        String senha = loginRequest.getSenha(); // Ajuste se o campo for "password"
+        try {
+            // Validação básica dos campos
+            if (loginRequest.getEmail() == null || loginRequest.getEmail().isBlank()) {
+                return ResponseEntity.badRequest()
+                    .body(new LoginResponse("O email é obrigatório", false));
+            }
 
-        // Busca usuário pelo email
-        Usuario usuario = repository.findByEmail(email);
-        if (usuario != null && usuario.getSenha().equals(senha)) {
-            return ResponseEntity.ok(new LoginResponse("Login bem-sucedido!"));
-        } else {
-            return ResponseEntity.badRequest().body(new LoginResponse("Credenciais inválidas!"));
+            if (loginRequest.getSenha() == null || loginRequest.getSenha().isBlank()) {
+                return ResponseEntity.badRequest()
+                    .body(new LoginResponse("A senha é obrigatória", false));
+            }
+
+            // Busca usuário pelo email
+            Usuario usuario = repository.findByEmail(loginRequest.getEmail());
+            
+            if (usuario == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new LoginResponse("Credenciais inválidas", false));
+            }
+
+            // Verifica a senha (em produção, use BCryptPasswordEncoder)
+            if (!usuario.getSenha().equals(loginRequest.getSenha())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new LoginResponse("Credenciais inválidas", false));
+            }
+
+            // Login bem-sucedido
+            return ResponseEntity.ok(new LoginResponse(
+                "Login bem-sucedido", 
+                true,
+                usuario.getNome(),
+                usuario.getTipo()
+            ));
+            
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                .body(new LoginResponse("Erro no servidor: " + e.getMessage(), false));
         }
     }
+
     @GetMapping
-        public ResponseEntity<?> listarTodosUsuarios() {
+    public ResponseEntity<?> listarTodosUsuarios() {
         return ResponseEntity.ok(repository.findAll());
     }
-
 }
 
 class LoginRequest {
     private String email;
-    private String senha; // Ajuste se for "password"
+    private String senha;
 
+    // Getters e Setters
     public String getEmail() {
         return email;
     }
@@ -60,16 +89,38 @@ class LoginRequest {
 
 class LoginResponse {
     private String message;
+    private boolean success;
+    private String nome;
+    private String tipo;
 
-    public LoginResponse(String message) {
+    // Construtor para respostas de erro
+    public LoginResponse(String message, boolean success) {
         this.message = message;
+        this.success = success;
     }
 
+    // Construtor para respostas de sucesso
+    public LoginResponse(String message, boolean success, String nome, String tipo) {
+        this.message = message;
+        this.success = success;
+        this.nome = nome;
+        this.tipo = tipo;
+    }
+
+    // Getters
     public String getMessage() {
         return message;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public String getTipo() {
+        return tipo;
     }
 }

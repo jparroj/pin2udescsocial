@@ -1,89 +1,118 @@
-// frontend/src/components/LoginForm.jsx
 import { useState } from 'react';
-import { login } from '../services/authService';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 export default function LoginForm() {
-  const [email, setEmail] = useState('');
+  const [id, setId] = useState('');
   const [senha, setSenha] = useState('');
-  const [mensagem, setMensagem] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const { message } = await login(email, senha);
-    setMensagem(message);
-  };
+  e.preventDefault();
+  setLoading(true);
+  setError('');
+
+  try {
+    const response = await axios.post('http://localhost:8010/login', {
+      email: id,  // Mude de "id" para "email"
+      senha: senha
+    });
+
+    if (response.data.message === "Login bem-sucedido!") {
+      navigate('/dashboard');
+    } else {
+      setError(response.data.message || 'Credenciais inválidas');
+    }
+  } catch (err) {
+    setError(err.response?.data?.message || 'Erro ao conectar com o servidor');
+    console.error('Erro no login:', err);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        {/* Cabeçalho UDESC */}
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-blue-800">UDESC</h1>
-          <p className="text-sm text-gray-600">UNIVERSIDADE DO ESTADO DE SANTA CATARINA</p>
-          <h2 className="text-xl mt-4 text-blue-600">Bem vindo ao UDESC SOCIAL</h2>
-          <p className="text-sm text-gray-500 mt-2">para acessar tenha em mão seu login e senha de acesso</p>
-        </div>
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
+      {/* Logo */}
+      <img 
+        src="/udesc-logo.png" 
+        alt="UDESC Logo" 
+        className="w-28 h-28 mb-6"
+      />
 
-        {/* Divisor */}
-        <div className="border-t border-gray-300 my-6"></div>
-
-        {/* Formulário */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">ID UDESC</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Digite seu ID UDESC"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Senha</label>
-            <input
-              type="password"
-              value={senha}
-              onChange={(e) => setSenha(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Digite sua senha"
-              required
-            />
-            <a href="#" className="text-xs text-blue-600 hover:underline">Esqueceu sua senha?</a>
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          >
-            ENTRAR
-          </button>
-        </form>
-
-        {/* Divisor */}
-        <div className="relative my-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300"></div>
-          </div>
-          <div className="relative flex justify-center">
-            <span className="bg-white px-2 text-sm text-gray-500">Ou</span>
-          </div>
-        </div>
-
-        {/* Ícone opcional */}
-        <div className="text-center">
-          <span className="text-2xl">😊</span>
-        </div>
-
-        {/* Mensagem de feedback */}
-        {mensagem && (
-          <div className={`mt-4 p-2 text-sm rounded-md ${mensagem.includes('bem-sucedido') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-            {mensagem}
-          </div>
-        )}
+      {/* Cabeçalho */}
+      <div className="text-center mb-6">
+        <h1 className="text-3xl font-bold text-gray-800 mb-1">UDESC</h1>
+        <p className="text-lg text-gray-700 leading-tight">
+          UNIVERSIDADE<br />
+          DO ESTADO DE<br />
+          SANTA CATARINA
+        </p>
       </div>
+
+      {/* Título */}
+      <h2 className="text-2xl font-semibold text-blue-800 mb-3">Bem-vindo ao UDESC SOCIAL</h2>
+      <p className="text-gray-600 mb-8">
+        Para acessar, tenha em mãos seu ID e senha institucional.
+      </p>
+
+      {/* Mensagem de erro */}
+      {error && (
+        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm w-full max-w-sm">
+          {error}
+        </div>
+      )}
+
+      {/* Formulário */}
+      <form onSubmit={handleSubmit} className="w-full max-w-sm text-left">
+        <div className="mb-5">
+          <label className="block text-gray-700 text-md font-medium mb-2">ID UDESC</label>
+          <input
+            type="text"
+            value={id}
+            onChange={(e) => setId(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            placeholder="Digite seu ID UDESC"
+            disabled={loading}
+            required
+          />
+        </div>
+
+        <div className="mb-6">
+          <label className="block text-gray-700 text-md font-medium mb-2">Senha</label>
+          <input
+            type="password"
+            value={senha}
+            onChange={(e) => setSenha(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            placeholder="Digite sua senha"
+            disabled={loading}
+            required
+          />
+          <div className="text-right mt-2">
+            <a href="#" className="text-sm text-blue-600 hover:text-blue-800">
+              Esqueceu sua senha?
+            </a>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className={`w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-all duration-300 ${
+            loading ? 'opacity-75 cursor-not-allowed' : ''
+          }`}
+        >
+          {loading ? 'ENTRANDO...' : 'ENTRAR'}
+        </button>
+      </form>
+
+      {/* Rodapé */}
+      <p className="text-gray-400 text-xs mt-12">
+        © {new Date().getFullYear()} UDESC SOCIAL
+      </p>
     </div>
   );
 }

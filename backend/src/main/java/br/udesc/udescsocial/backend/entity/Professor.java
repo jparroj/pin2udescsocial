@@ -1,3 +1,5 @@
+// Classe criada para guardar as informações de cada professor, como o ID, nome, e-mail e departamento, etc.
+
 package br.udesc.udescsocial.backend.entity;
 
 import jakarta.persistence.*;

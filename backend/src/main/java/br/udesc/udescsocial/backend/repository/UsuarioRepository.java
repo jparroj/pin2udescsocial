@@ -1,4 +1,3 @@
-// src/main/java/br/udesc/udescsocial/backend/repository/UsuarioRepository.java
 package br.udesc.udescsocial.backend.repository;
 
 import br.udesc.udescsocial.backend.entity.Usuario;

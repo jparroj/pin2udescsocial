@@ -29,25 +29,26 @@ public class AnuncioController {
         this.anuncioFotoRepository = anuncioFotoRepository;
     }
     
-    @GetMapping // Permite filtrar/Listar anúncios por tipo -> GET /anuncios
-    public ResponseEntity<?> listarAnuncios(
-        @RequestParam(required = false) String tipo) {
+   @GetMapping
+public ResponseEntity<?> listarAnuncios(
+    @RequestParam(required = false) String tipo) {
+    
+    try {
+        // Usando o método com apenas o parâmetro tipo
+        List<Anuncio> anuncios = anuncioRepository.findWithFilters(tipo);
         
-        try {
-            List<Anuncio> anuncios = anuncioRepository.findWithFilters(tipo);
-            
-            if (anuncios.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("Nenhum anúncio encontrado com os critérios especificados");
-            }
-            
-            return ResponseEntity.ok(anuncios);
-            
-        } catch (Exception ex) {
-            return ResponseEntity.internalServerError()
-                    .body("Erro ao buscar anúncios: " + ex.getMessage());
+        if (anuncios.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Nenhum anúncio encontrado com os critérios especificados");
         }
+        
+        return ResponseEntity.ok(anuncios);
+        
+    } catch (Exception ex) {
+        return ResponseEntity.internalServerError()
+                .body("Erro ao buscar anúncios: " + ex.getMessage());
     }
+}
     
     @PostMapping// Criar novo anúncio -> POST /anuncios
     @Transactional

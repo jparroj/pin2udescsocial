@@ -1,43 +1,53 @@
 package br.udesc.udescsocial.backend.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 
 @Entity
+@Table(name = "professor",
+       uniqueConstraints = @UniqueConstraint(name = "uk_professor_usuario", columnNames = "usuario_id"))
 public class Professor {
-
+    
     @Id
-    private Long usuarioId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(nullable = false)
-    private String nome;
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "usuario_id", referencedColumnName = "id", 
+               foreignKey = @ForeignKey(name = "fk_professor_usuario"))
+    private Usuario usuario;
 
-    @Column(nullable = false, unique = true)
-    private String email;
-
+    @NotBlank(message = "Departamento é obrigatório")
+    @Size(max = 100, message = "Departamento deve ter no máximo 100 caracteres")
+    @Column(nullable = false, length = 100)
     private String departamento;
 
-    public Long getUsuarioId() {
-        return usuarioId;
+    // Construtor padrão
+    public Professor() {}
+
+    // Construtor com campos obrigatórios
+    public Professor(Usuario usuario, String departamento) {
+        setUsuario(usuario); // Usa o setter para validação
+        this.departamento = departamento;
     }
 
-    public void setUsuarioId(Long usuarioId) {
-        this.usuarioId = usuarioId;
+    // Getters e Setters com validação
+    public Long getId() {
+        return id;
     }
 
-    public String getNome() {
-        return nome;
+    public Usuario getUsuario() {
+        return usuario;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
+    public void setUsuario(Usuario usuario) {
+        if (usuario == null) {
+            throw new IllegalArgumentException("Usuário não pode ser nulo");
+        }
+        if (!"PROFESSOR".equals(usuario.getTipo())) {
+            throw new IllegalArgumentException("O usuário deve ser do tipo PROFESSOR");
+        }
+        this.usuario = usuario;
     }
 
     public String getDepartamento() {
@@ -45,6 +55,9 @@ public class Professor {
     }
 
     public void setDepartamento(String departamento) {
+        if (departamento == null || departamento.trim().isEmpty()) {
+            throw new IllegalArgumentException("Departamento não pode ser vazio");
+        }
         this.departamento = departamento;
     }
 }

@@ -3,3 +3,31 @@ PORTA 8010;
 Postgres -> TEM QUE SER O MESMO SE NAO TEM QUE TODA VEZ TROCAR NO APPLICATION.PROPERTIES
 username: postgres
 password: 123456789
+
+
+Aplicação web para conexão entre alunos da UDESC, oferecendo recursos como anúncios de materiais, caronas e eventos.
+
+Pré-requisitos
+- Node.js 16.x ou superior
+- npm 8.x ou superior
+- Java 11+ (para o backend)
+- Banco de dados MySQL/PostgreSQL configurado
+
+### Instalação
+
+1. Clone o repositório:
+   bash
+   git clone https://github.com/jparroj/pin2udescsocial.git
+   cd udesc-social
+
+2. Configure o backend:
+    cd backend
+    cp src/main/resources/application.example.properties src/main/resources/application.properties
+    # Edite o arquivo com suas credenciais de banco de dados
+
+### Executando a Aplicação
+    cd backend
+    ./mvnw spring-boot:run    
+
+A aplicação estará disponível em:
+    Backend: http://localhost:8080

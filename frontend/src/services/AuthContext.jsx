@@ -25,9 +25,9 @@ export function AuthProvider({ children }) {
         },
         body: JSON.stringify(credentials),
       });
-      
+
       if (!response.ok) throw new Error('Login failed');
-      
+
       const userData = await response.json();
       setUser(userData);
       localStorage.setItem('user', JSON.stringify(userData));
@@ -45,14 +45,8 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      login, 
-      logout,
-      isAuthenticated: !!user,
-      loading
-    }}>
-      {children}
+    <AuthContext.Provider value={{ user, login, logout, isAuthenticated: !!user, loading }}>
+      {!loading && children}
     </AuthContext.Provider>
   );
 }

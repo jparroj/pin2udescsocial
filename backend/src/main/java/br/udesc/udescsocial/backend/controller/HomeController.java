@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/home")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true") // <--- ATUALIZE AQUI!
 public class HomeController {
 
     private final AnuncioRepository anuncioRepository;

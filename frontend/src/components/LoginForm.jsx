@@ -20,7 +20,7 @@ export default function LoginForm() {
       senha: senha
     });
 
-    if (response.data.message === "Login bem-sucedido!") {
+    if (response.data.message === "Login bem-sucedido") {
       navigate('/dashboard');
     } else {
       setError(response.data.message || 'Credenciais inválidas');

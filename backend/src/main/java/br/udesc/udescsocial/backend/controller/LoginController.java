@@ -2,13 +2,15 @@ package br.udesc.udescsocial.backend.controller;
 
 import br.udesc.udescsocial.backend.entity.Usuario;
 import br.udesc.udescsocial.backend.repository.UsuarioRepository;
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/login")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true"   )
 public class LoginController {
 
     private final UsuarioRepository repository;
@@ -18,7 +20,7 @@ public class LoginController {
     }
 
     @PostMapping
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest, HttpSession session) {
         try {
             // Validação básica dos campos
             if (loginRequest.getEmail() == null || loginRequest.getEmail().isBlank()) {
@@ -46,6 +48,7 @@ public class LoginController {
             }
 
             // Login bem-sucedido
+            session.setAttribute("usuario", usuario);
             return ResponseEntity.ok(new LoginResponse(
                 "Login bem-sucedido", 
                 true,
@@ -58,6 +61,23 @@ public class LoginController {
                 .body(new LoginResponse("Erro no servidor: " + e.getMessage(), false));
         }
     }
+
+    // Adicione no seu LoginController.java
+@PostMapping("/logout")
+public ResponseEntity<Void> logout(HttpSession session) {
+    session.invalidate();
+    return ResponseEntity.ok().build();
+}
+
+@GetMapping("/me")
+public ResponseEntity<Usuario> getCurrentUser(HttpSession session) {
+    Usuario usuario = (Usuario) session.getAttribute("usuario");
+    if (usuario == null) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+    return ResponseEntity.ok(usuario);
+}
+
 
     @GetMapping
     public ResponseEntity<?> listarTodosUsuarios() {

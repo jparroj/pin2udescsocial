@@ -8,9 +8,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List; // Necessário para listarTodosUsuarios
+
 @RestController
 @RequestMapping("/login")
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true"   )
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class LoginController {
 
     private final UsuarioRepository repository;
@@ -25,12 +27,12 @@ public class LoginController {
             // Validação básica dos campos
             if (loginRequest.getEmail() == null || loginRequest.getEmail().isBlank()) {
                 return ResponseEntity.badRequest()
-                    .body(new LoginResponse("O email é obrigatório", false));
+                    .body(new LoginResponse("O email é obrigatório", false, null, null, null)); // Adaptação para construtor
             }
 
             if (loginRequest.getSenha() == null || loginRequest.getSenha().isBlank()) {
                 return ResponseEntity.badRequest()
-                    .body(new LoginResponse("A senha é obrigatória", false));
+                    .body(new LoginResponse("A senha é obrigatória", false, null, null, null)); // Adaptação para construtor
             }
 
             // Busca usuário pelo email
@@ -38,45 +40,47 @@ public class LoginController {
             
             if (usuario == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new LoginResponse("Credenciais inválidas", false));
+                    .body(new LoginResponse("Credenciais inválidas", false, null, null, null)); // Adaptação para construtor
             }
 
             // Verifica a senha (em produção, use BCryptPasswordEncoder)
             if (!usuario.getSenha().equals(loginRequest.getSenha())) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new LoginResponse("Credenciais inválidas", false));
+                    .body(new LoginResponse("Credenciais inválidas", false, null, null, null)); // Adaptação para construtor
             }
 
             // Login bem-sucedido
             session.setAttribute("usuario", usuario);
             return ResponseEntity.ok(new LoginResponse(
-                "Login bem-sucedido", 
+                "Login bem-sucedido",
                 true,
                 usuario.getNome(),
-                usuario.getTipo()
+                usuario.getTipo(),
+                usuario.getId() // <--- Passando o ID do usuário
             ));
             
         } catch (Exception e) {
             return ResponseEntity.internalServerError()
-                .body(new LoginResponse("Erro no servidor: " + e.getMessage(), false));
+                .body(new LoginResponse("Erro no servidor: " + e.getMessage(), false, null, null, null)); // Adaptação para construtor
         }
     }
 
-    // Adicione no seu LoginController.java
-@PostMapping("/logout")
-public ResponseEntity<Void> logout(HttpSession session) {
-    session.invalidate();
-    return ResponseEntity.ok().build();
-}
-
-@GetMapping("/me")
-public ResponseEntity<Usuario> getCurrentUser(HttpSession session) {
-    Usuario usuario = (Usuario) session.getAttribute("usuario");
-    if (usuario == null) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpSession session) {
+        session.invalidate();
+        return ResponseEntity.ok().build();
     }
-    return ResponseEntity.ok(usuario);
-}
+
+    @GetMapping("/me")
+    public ResponseEntity<Usuario> getCurrentUser(HttpSession session) {
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if (usuario == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        // É uma boa prática não retornar a senha
+        usuario.setSenha(null); 
+        return ResponseEntity.ok(usuario); // Retorna o objeto Usuario, que já contém o ID
+    }
 
 
     @GetMapping
@@ -107,24 +111,31 @@ class LoginRequest {
     }
 }
 
-class LoginResponse {
+// CLASSE LoginResponse ATUALIZADA - Mova esta classe para fora da classe LoginController
+// ou mantenha-a como uma classe interna estática se preferir, mas é bom que ela seja independente
+// ou mova para um pacote DTO separado.
+// Para fins de correção do erro, vou mantê-la como classe interna, mas com o construtor correto.
+// Idealmente, você a declararia como 'public record LoginResponse(...)' em um arquivo LoginResponse.java separado
+// no pacote 'br.udesc.udescsocial.backend.dto'.
+class LoginResponse { // <--- ESTA É A CLASSE QUE PRECISA SER ATUALIZADA NO SEU ARQUIVO!
     private String message;
     private boolean success;
     private String nome;
     private String tipo;
+    private Long userId; // NOVO CAMPO
 
-    // Construtor para respostas de erro
-    public LoginResponse(String message, boolean success) {
-        this.message = message;
-        this.success = success;
-    }
-
-    // Construtor para respostas de sucesso
-    public LoginResponse(String message, boolean success, String nome, String tipo) {
+    // Construtor para respostas de erro (com userId opcional, pode ser null)
+    public LoginResponse(String message, boolean success, String nome, String tipo, Long userId) {
         this.message = message;
         this.success = success;
         this.nome = nome;
         this.tipo = tipo;
+        this.userId = userId;
+    }
+
+    // Construtor auxiliar para casos de erro onde nome/tipo/userId não são aplicáveis
+    public LoginResponse(String message, boolean success) {
+        this(message, success, null, null, null);
     }
 
     // Getters
@@ -142,5 +153,9 @@ class LoginResponse {
 
     public String getTipo() {
         return tipo;
+    }
+
+    public Long getUserId() { // NOVO GETTER
+        return userId;
     }
 }

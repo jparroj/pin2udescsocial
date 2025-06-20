@@ -1,89 +1,54 @@
+// frontend/src/App.jsx
 import React from 'react';
-// Não precisamos do BrowserRouter aqui, pois ele já estará no main.jsx
-import { Routes, Route, Navigate } from 'react-router-dom'; 
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from './context/AuthContext';
 
-// Importe o useAuth do AuthContext, mas NÃO o AuthProvider aqui
-import { useAuth } from './context/AuthContext'; 
-
-// Importe suas páginas
 import WelcomePage from './pages/WelcomePage';
 import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
-import AnnouncementsPage from './pages/AnnouncementsPage';
-import ProfilePage from './pages/ProfilePage';
+// Certifique-se que CaronasPage está importado
+import CaronasPage from './pages/CaronasPage'; // <-- Importe CaronasPage
 
-// Importe seus componentes de layout
-import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 
-// Importe seus estilos globais
-import './styles/global.css';
+import './styles/global.css'; // Mantenha o import dos estilos globais
 
-// Componente para proteger rotas que precisam de autenticação
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
-
-  if (loading) {
-    return <div>Carregando...</div>; // Pode colocar spinner aqui se quiser
-  }
-
-  // Se não estiver autenticado, redireciona para a página de login
+  if (loading) return <div>Carregando...</div>;
   return isAuthenticated ? children : <Navigate to="/login" replace />;
 }
 
 function App() {
   return (
-    // Removido <BrowserRouter> daqui, pois ele deve envolver o App no main.jsx
-    <Routes>
-      {/* Rota da Página de Boas-Vindas (sem Navbar) */}
-      {/* Esta é a página inicial que o usuário vê antes de tentar fazer login */}
-      <Route path="/" element={<WelcomePage />} />
+    // NOVO: Wrapper principal para a aplicação inteira para gerenciar a altura
+    <div className="app-container"> {/* <--- ADICIONE ESTA DIV */}
+      <div className="main-content-wrapper"> {/* <--- ADICIONE ESTA DIV */}
+        <Routes>
+          <Route path="/" element={<WelcomePage />} />
+          <Route path="/login" element={<LoginPage />} />
 
-      {/* Rota para a Página de Login */}
-      {/* É importante ter uma rota explícita para /login */}
-      <Route path="/login" element={<LoginPage />} />
+          <Route path="/home" element={
+            <ProtectedRoute>
+              <HomePage />
+              {/* O Footer será movido para fora daqui se ele for sempre no final da tela */}
+            </ProtectedRoute>
+          } />
 
-      {/* Rotas Protegidas (com Navbar) */}
-      {/* Use o ProtectedRoute para envolver as páginas que só podem ser acessadas por usuários logados */}
+          {/* Rota para a Página de Caronas */}
+          <Route path="/caronas" element={
+            <ProtectedRoute>
+              <CaronasPage />
+              {/* O Footer será movido para fora daqui */}
+            </ProtectedRoute>
+          } />
 
-      <Route
-        path="/home"
-        element={
-          <ProtectedRoute>
-            <Navbar />
-            <HomePage />
-            <Footer /> {/* Adicione o Footer se ele for parte do layout padrão */}
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/announcements"
-        element={
-          <ProtectedRoute>
-            <Navbar />
-            <AnnouncementsPage />
-            <Footer />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/profile"
-        element={
-          <ProtectedRoute>
-            <Navbar />
-            <ProfilePage />
-            <Footer />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* Rota de fallback para qualquer caminho não encontrado */}
-      {/* Pode redirecionar para a página inicial ou uma página 404 */}
-      <Route path="*" element={<Navigate to="/" replace />} /> 
-
-    </Routes>
+          {/* Rota de fallback */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </div> {/* <--- FECHA main-content-wrapper */}
+      <Footer /> {/* <--- FOOTER AGORA FORA DAS ROTAS, NO FINAL DO app-container */}
+    </div> // <--- FECHA app-container
   );
 }
 

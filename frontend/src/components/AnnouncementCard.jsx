@@ -1,25 +1,27 @@
-// import './styles/cards.css';
+// frontend/src/components/AnnouncementCard.jsx
 
-export default function AnnouncementCard({ anuncio }) {
+import React from 'react';
+import '../styles/cards.css';
+
+export default function AnnouncementCard({ anuncio, type = 'full' }) {
+  const isRecommendation = type === 'recommendation';
+
   return (
-    <div className="announcement-card">
+    <div className={`announcement-card ${isRecommendation ? 'recommendation-card' : 'full-card'}`}>
       {anuncio.fotoPrincipal && (
-        <img 
-          src={anuncio.fotoPrincipal} 
+        <img
+          src={anuncio.fotoPrincipal}
           alt={anuncio.titulo}
-          className="announcement-image"
+          className={`announcement-image ${isRecommendation ? 'recommendation-image' : ''}`}
         />
       )}
       <div className="announcement-content">
-        <h3>{anuncio.titulo}</h3>
-        <div className="announcement-meta">
-          <span className="announcement-type">{anuncio.tipo}</span>
-          <span className="announcement-location">{anuncio.local}</span>  
-        </div>
-        <p className="announcement-author">Por: {anuncio.autorNome}</p>
-        <time className="announcement-date">
-          {new Date(anuncio.dataPublicacao).toLocaleDateString('pt-BR')}
-        </time>
+        {/* ... código existente ... */}
+        
+        {/* Linha corrigida: Removido o escape desnecessário para o ponto */}
+        <div className={`announcement-tag ${anuncio.tipo.toLowerCase().replace(/[\s.]/g, '-')}`}>{anuncio.tipo}</div>
+        {/* Ou, se o tipo puder ter outros caracteres especiais que você também queira substituir, poderia ser mais abrangente, ex: replace(/[^a-z0-9]/g, '-') */}
+
       </div>
     </div>
   );

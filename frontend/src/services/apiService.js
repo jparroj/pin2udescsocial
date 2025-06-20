@@ -1,17 +1,42 @@
-const API_BASE = 'http://localhost:8010/api'; // Note: API_BASE is relative. Make sure your frontend serves from a path that makes this work, or use a full URL like 'http://localhost:8010/api' if not.
-                          // For consistency with previous discussions, it's safer to use the full URL if your frontend is not proxied to the backend.
+// frontend/src/services/apiService.js
+
+// Recomendado: Use a URL completa do seu backend, incluindo a porta
+const API_BASE = 'http://localhost:8010/api'; 
 
 export const fetchHomeData = async () => {
   const response = await fetch(`${API_BASE}/home`, {
-    credentials: 'include' // <--- ADICIONE ESTA LINHA AQUI!
+    credentials: 'include' // Garante que os cookies de sessão sejam enviados
   });
   if (!response.ok) {
-    // É uma boa prática lançar o erro com a mensagem do servidor, se disponível
-    const errorData = await response.json().catch(() => ({ message: 'Erro desconhecido' }));
+    const errorData = await response.json().catch(() => ({ message: 'Erro desconhecido ao buscar home data' }));
     throw new Error(errorData.message || 'Failed to fetch home data');
   }
   return await response.json();
 };
+
+// NOVA FUNÇÃO: Para buscar recomendações
+export const fetchRecommendations = async (quantidade = 4) => {
+    try {
+        const response = await fetch(`${API_BASE}/home/recommendations?quantidadeRecomendacoes=${quantidade}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include' // Garante que os cookies de sessão sejam enviados
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ message: 'Erro desconhecido ao buscar recomendações' }));
+            throw new Error(errorData.message || 'Failed to fetch recommendations');
+        }
+
+        return await response.json(); // Retorna a lista de AnuncioResumoDTO
+    } catch (error) {
+        console.error('Erro na requisição de recomendações:', error);
+        throw error;
+    }
+};
+
 
 export const fetchAnnouncements = async (params = {}) => {
   const query = new URLSearchParams(params).toString();
@@ -19,7 +44,7 @@ export const fetchAnnouncements = async (params = {}) => {
     credentials: 'include'
   });
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({ message: 'Erro desconhecido' }));
+    const errorData = await response.json().catch(() => ({ message: 'Erro desconhecido ao buscar announcements' }));
     throw new Error(errorData.message || 'Failed to fetch announcements');
   }
   return await response.json();
@@ -35,7 +60,7 @@ export const createAnnouncement = async (announcementData) => {
     credentials: 'include'
   });
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({ message: 'Erro desconhecido' }));
+    const errorData = await response.json().catch(() => ({ message: 'Erro desconhecido ao criar anuncio' }));
     throw new Error(errorData.message || 'Failed to create announcement');
   }
   return await response.json();

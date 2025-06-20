@@ -1,20 +1,48 @@
+/* frontend/src/styles/global.css */
+
 :root {
   --primary-color: #1976d2;
   --secondary-color: #f5f5f5;
   --text-color: #333;
   --error-color: #d32f2f;
+  --background-grey: #f9f9f9;
 }
 
-* {
+/* Reset CSS Universal - GARANTE TUDO A 0 */
+html, body, #root, #root > div { /* <--- ATENÇÃO: Adicionado '#root > div' se o App for envolvido por um div invisível */
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  height: 100%; /* Garante altura total */
+  width: 100%;  /* Garante largura total */
 }
+
+/* Adicionado um reset universal para todos os elementos */
+*, *::before, *::after {
+  box-sizing: inherit; /* Herda o box-sizing */
+  margin: 0;
+  padding: 0;
+}
+
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
   color: var(--text-color);
+  background-color: var(--background-grey);
+  overflow-x: hidden; /* Mantido para evitar barra de rolagem horizontal */
+  overflow-y: auto;   /* Permite rolagem vertical */
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--background-grey);
+}
+
+.main-content-wrapper {
+  flex: 1;
 }
 
 a {

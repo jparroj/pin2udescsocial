@@ -58,7 +58,7 @@ export default function WelcomePage() {
                     <input
                         id="id-udesc"
                         type="text"
-                        placeholder="Digite seu ID UDESC"
+                        placeholder="Digite seu email UDESC"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         disabled={loading} // <--- Desabilita o input enquanto carrega

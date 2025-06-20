@@ -1,0 +1,66 @@
+/* frontend/src/styles/footer.css */
+.footer {
+    background-color: white; /* Cor de fundo branca para o rodapé */
+    border-top: 1px solid #eee; /* Borda superior sutil */
+    padding: 0.8rem 1.5rem;
+    text-align: center;
+    position: fixed; /* Fixa o rodapé na parte inferior da tela */
+    bottom: 0;
+    width: 100%;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); /* Sombra para dar profundidade */
+    display: flex;
+    justify-content: center; /* Centraliza o conteúdo */
+    align-items: center;
+}
+
+.footer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 960px; /* Limita a largura do conteúdo */
+}
+
+.footer-nav-icons {
+    display: flex;
+    justify-content: space-around; /* Espalha os ícones */
+    width: 100%; /* Ocupa toda a largura do container */
+    max-width: 400px; /* Limita a largura dos ícones */
+    margin-bottom: 0.5rem; /* Espaço entre ícones e copyright */
+}
+
+.footer-icon-link {
+    padding: 0.5rem; /* Área clicável maior */
+    border-radius: 50%; /* Faz o círculo */
+    transition: background-color 0.2s;
+    display: flex; /* Para centralizar o ícone */
+    justify-content: center;
+    align-items: center;
+}
+
+.footer-icon-link:hover {
+    background-color: #f0f0f0; /* Fundo cinza claro ao passar o mouse */
+}
+
+.footer-icon {
+    width: 30px; /* Tamanho dos ícones no rodapé */
+    height: 30px;
+}
+
+.footer-copyright {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+/* Media queries para telas maiores (se os links da navbar forem re-habilitados) */
+@media (min-width: 769px) {
+    .footer {
+        position: static; /* Rodapé estático para telas grandes */
+        border-top: none;
+        box-shadow: none;
+        padding: 1rem 0; /* Padding menor */
+    }
+    .footer-nav-icons {
+        display: none; /* Esconde os ícones do footer em telas maiores */
+    }
+}

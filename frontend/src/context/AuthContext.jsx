@@ -13,11 +13,16 @@ export function AuthProvider({ children }) {
     useEffect(() => {
         const checkAuthStatus = async () => {
             try {
-                const currentUser = await getCurrentUser();
-                if (currentUser) {
-                    setUser(currentUser);
+                // Tenta obter o usuário atual do backend (que verifica a sessão)
+                const currentUser = await getCurrentUser(); // Assume que /login/me retorna o Usuario completo (com ID)
+                
+                // CRÍTICO: Verifica se currentUser existe E se tem um ID.
+                // Se o backend /login/me retornar um Usuario, ele deve ter o ID.
+                if (currentUser && currentUser.id) {
+                    setUser(currentUser); // Define o usuário como o objeto completo vindo do backend
                     localStorage.setItem('user', JSON.stringify(currentUser));
                 } else {
+                    // Se não há usuário logado ou o objeto não tem ID, limpa e define como nulo
                     localStorage.removeItem('user');
                     setUser(null);
                 }
@@ -36,21 +41,22 @@ export function AuthProvider({ children }) {
     const login = async (email, senha) => {
         try {
             console.log("AuthContext: Iniciando processo de login para:", email);
-            const data = await authServiceLogin(email, senha);
+            const data = await authServiceLogin(email, senha); // 'data' deve ter data.userId
 
             console.log("AuthContext: Dados recebidos do authServiceLogin:", data);
             console.log("AuthContext: data.success é:", data.success);
 
             if (data.success) {
                 const loggedUser = {
+                    id: data.userId, // <--- ESTA LINHA É CRÍTICA: Pegar o userId da resposta
                     nome: data.nome,
                     tipo: data.tipo,
-                    email: email
+                    email: email // Manter o email, útil para o frontend
                 };
                 setUser(loggedUser);
                 localStorage.setItem('user', JSON.stringify(loggedUser));
-                console.log("AuthContext: Login bem-sucedido! Redirecionando para /home."); // <--- LOG ATUALIZADO
-                navigate('/home'); // <--- MUDANÇA PRINCIPAL AQUI: DE '/dashboard' PARA '/home'
+                console.log("AuthContext: Login bem-sucedido! Redirecionando para /home.");
+                navigate('/home');
             } else {
                 console.error("AuthContext: Login falhou (data.success é false):", data.message);
                 throw new Error(data.message || 'Falha no login');

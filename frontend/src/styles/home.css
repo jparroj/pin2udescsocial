@@ -1,39 +1,170 @@
+/* frontend/src/styles/home.css */
+
 .home-page {
-  padding: 2rem;
+    padding: 1rem;
+    /* max-width: 1200px; */ /* <--- REMOVIDO: Para ocupar a largura total da página */
+    margin: 0 auto;
+    background-color: #f9f9f9;
+    min-height: 80vh;
+    width: 100%; /* Garante que ocupe toda a largura disponível */
 }
 
-.loading,
-.error {
-  text-align: center;
-  font-size: 1.2rem;
-  margin-top: 2rem;
+/* Estilos para o cabeçalho dentro da HomePage */
+.home-header {
+    background: #216a3a;
+    color: white;
+    padding: 1.5rem 1rem;
+    margin: -1rem -1rem 2rem -1rem;
+    border-radius: 0 0 10px 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
+.home-header-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    /* max-width: 960px; */ /* <--- REMOVIDO: Para que o cabeçalho se estenda na largura total */
+    margin: 0 auto;
+    padding: 0 1rem; /* Adiciona padding interno para o conteúdo não colar nas bordas */
+}
+
+.home-udesc-logo {
+    width: 180px; /* <--- AUMENTADO: Tamanho do logo da UDESC no cabeçalho (ajuste conforme necessário) */
+    height: auto;
+    flex-shrink: 0;
+}
+
+.home-header-text {
+    flex-grow: 1;
+}
+
+.home-welcome-greeting {
+    font-size: 1rem;
+    opacity: 0.9;
+    margin-bottom: 0.2rem;
+}
+
+.home-user-name {
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+
+/* Estilos para a Seção de Categorias */
+.categories-section {
+    margin-bottom: 2rem;
+    padding: 0 1rem; /* Adiciona padding para alinhar com o conteúdo do header */
+}
+
+h2 {
+    color: #333;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    text-align: center;
+}
+
+.category-item-card {
+    background-color: white;
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 120px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.category-item-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.category-icon {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 0.5rem;
+}
+
+.category-name {
+    font-weight: bold;
+    color: #555;
+    font-size: 1rem;
+}
+
+
+/* Estilos para a Seção de Recomendações */
+.recommendations-section {
+    margin-bottom: 2rem;
+    padding: 0 1rem; /* Adiciona padding para alinhar com o conteúdo do header */
+}
+
+.recommendations-container {
+    /* MUDANÇA: Usar grid para ocupar o espaço e manter a responsividade */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* <--- Permite que os cards se adaptem e preencham a linha */
+    gap: 1.5rem; /* Espaçamento entre os cards */
+    /* Removido overflow-x: auto; e nowrap para que os cards quebrem em múltiplas linhas */
+    /* Removido -webkit-overflow-scrolling e scrollbar-width */
+    padding-bottom: 0; /* Não precisa de padding extra para scrollbar */
+}
+
+/* Estilos para a Seção de Últimos Anúncios */
 .recent-announcements {
-  margin-top: 2rem;
+    margin-bottom: 2rem;
+    padding: 0 1rem; /* Adiciona padding para alinhar com o conteúdo do header */
 }
 
 .announcements-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
 }
 
-.categories {
-  margin-top: 3rem;
+/* Estilos de estado */
+.loading, .error {
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.2rem;
+    color: #555;
+}
+.error {
+    color: var(--error-color);
+    background-color: #ffebee;
+    border-radius: 8px;
+    margin: 1rem 0;
 }
 
-.category-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  list-style: none;
-  padding: 0;
-}
-
-.category-item {
-  background: #f0f0f0;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-weight: bold;
+/* Media Queries para Responsividade */
+@media (max-width: 768px) {
+    .home-header {
+        border-radius: 0;
+    }
+    .home-header-content {
+        padding: 0 0.5rem; /* Menos padding em telas pequenas */
+    }
+    .home-udesc-logo {
+        width: 90px; /* Logo um pouco menor em telas pequenas */
+    }
+    .home-user-name {
+        font-size: 1.5rem;
+    }
+    .categories-section, .recommendations-section, .recent-announcements {
+        padding: 0 0.5rem; /* Menos padding lateral nas seções */
+    }
+    .category-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .announcements-grid, .recommendations-container { /* Recomendações também em uma coluna se minmax for menor */
+        grid-template-columns: 1fr;
+    }
 }

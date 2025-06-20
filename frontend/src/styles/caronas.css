@@ -1,0 +1,476 @@
+/* frontend/src/styles/caronas.css */
+
+/* Contêiner principal da página de Caronas */
+.caronas-page {
+    padding: 1rem;
+    margin: 0 auto;
+    background-color: #f9f9f9;
+    min-height: 80vh;
+    width: 100%;
+}
+
+/* Cabeçalho da Página de Caronas */
+.caronas-header {
+    background: #216a3a;
+    color: white;
+    padding: 1.5rem 0; /* Removendo padding lateral aqui para colar os extremos */
+    margin: -1rem -1rem 2rem -1rem;
+    border-radius: 0 0 10px 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    position: relative;
+    z-index: 10;
+}
+
+/* Conteúdo interno do cabeçalho */
+.caronas-header .home-header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0; /* Removendo padding lateral aqui para colar os extremos */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    position: relative;
+}
+
+/* Grupo para o botão de voltar e a logo no canto esquerdo */
+.caronas-header .left-header-group {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem; /* Espaço entre o botão e a logo */
+    flex-shrink: 0;
+    min-width: fit-content; /* Ajusta a largura ao conteúdo */
+    /* Removendo margin-left aqui para colar no canto */
+    margin-left: 0; 
+    z-index: 2;
+}
+
+.caronas-header .back-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-right: 0.2rem; /* Espaço entre o botão e a logo */
+}
+
+.caronas-header .back-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.caronas-header .home-udesc-logo {
+    width: 120px; /* Tamanho da logo no cabeçalho */
+    height: auto;
+    flex-shrink: 0;
+}
+
+/* Título da Página - Centralizado */
+.caronas-header .home-header-text {
+    flex-grow: 1; /* Permite que o título ocupe o espaço central */
+    text-align: center;
+    /* Para centralizar perfeitamente no espaço disponível */
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: fit-content; /* Ocupa apenas o espaço do conteúdo */
+    white-space: nowrap; /* Evita que o texto quebre linha */
+    z-index: 1; /* Garante que o título esteja acima de outros elementos na mesma linha */
+}
+
+.caronas-header .home-welcome-greeting {
+    font-size: 1.8rem;
+    font-weight: bold;
+    opacity: 1;
+    margin: 0;
+    line-height: 1.2;
+}
+
+/* Grupo para o lado direito do cabeçalho (que agora estará vazio como espaçador) */
+.caronas-header .right-header-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    min-width: fit-content; /* Ajusta a largura ao conteúdo */
+    /* Removendo margin-right aqui para colar no canto */
+    margin-right: 0;
+    z-index: 2;
+}
+
+/* Remover regras do offer-button-header do cabeçalho, pois ele não estará mais lá */
+.caronas-header .offer-button-header {
+    display: none; /* Oculta completamente o botão de oferecer se ele estivesse no cabeçalho */
+}
+.caronas-header .offer-button-header img {
+    display: none; /* Oculta a imagem também */
+}
+
+
+/* Contêiner das Abas e Formulários */
+.caronas-tabs-container {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    width: 100%; /* Garante que ocupe 100% da largura do seu pai (.caronas-page) */
+}
+
+/* Botões das Abas */
+.caronas-tab-buttons {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.5rem;
+}
+
+.tab-button {
+    background: none;
+    border: none;
+    padding: 0.8rem 1.2rem;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #555;
+    cursor: pointer;
+    transition: color 0.2s, border-bottom 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.tab-button .tab-icon {
+    width: 30px;
+    height: 30px;
+    filter: grayscale(100%);
+    opacity: 0.7;
+}
+
+.tab-button.active {
+    color: #216a3a;
+    border-bottom: 3px solid #216a3a;
+}
+
+.tab-button.active .tab-icon {
+    filter: none;
+    opacity: 1;
+}
+
+/* Conteúdo das Abas */
+.tab-content {
+    padding: 0;
+}
+
+/* Formulário de Busca/Oferta de Carona */
+.search-form-carona,
+.offer-form-carona {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem; /* Aumentei o gap para maior espaçamento entre os campos */
+    margin-bottom: 1.5rem; /* Aumentei a margem inferior */
+
+    /* Centralizar o formulário e AUMENTAR a largura */
+    align-items: center; /* Centraliza os itens horizontalmente */
+    max-width: 700px; /* Aumentei a largura máxima do formulário */
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 1rem; /* Adiciona um padding nas laterais para telas menores */
+}
+
+.search-form-carona input,
+.offer-form-carona input,
+.offer-form-carona textarea {
+    padding: 0.9rem; /* Aumentei o padding para deixar os campos mais altos */
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1.1rem; /* Aumentei o tamanho da fonte dos campos */
+    width: 100%; /* Isso garante que o input ocupe 100% da largura do seu PARENT (que agora tem max-width) */
+    max-width: 550px; /* Aumentei a largura máxima para os campos individuais */
+}
+
+.search-form-carona button,
+.carona-button {
+    padding: 1rem 1.5rem; /* Aumentei o padding para o botão ficar maior */
+    border-radius: 5px;
+    font-size: 1.1rem; /* Aumentei o tamanho da fonte do botão */
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+    width: 100%;
+}
+
+/* Botão Procurar - dentro do formulário de busca */
+.search-form-carona button {
+    max-width: 250px; /* Aumentei a largura desejada para o botão "Procurar" */
+    align-self: center; /* Centraliza o botão dentro do Flex container pai */
+}
+
+.carona-button.primary {
+    background-color: #216a3a;
+    color: white;
+}
+.carona-button.primary:hover {
+    background-color: #1a512d;
+}
+
+.carona-button.secondary {
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ccc;
+}
+.carona-button.secondary:hover {
+    background-color: #e0e0e0;
+}
+
+/* Lista de Caronas */
+.caronas-list-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.no-results,
+.initial-message {
+    text-align: center;
+    color: #888;
+    margin-top: 1.5rem;
+    font-size: 1.1rem; /* Um pouco maior para destaque */
+    padding: 1rem; /* Aumentei o padding */
+    background-color: #f0f0f0;
+    border-radius: 8px;
+
+    /* Limitar largura e centralizar */
+    max-width: 600px; /* Largura máxima desejada para a mensagem */
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%; /* Ocupa 100% da max-width */
+}
+
+.carona-alert-section {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px dashed #eee;
+
+    /* Centralizar e limitar largura da seção */
+    max-width: 600px; /* Largura máxima desejada para a seção */
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%; /* Ocupa 100% da max-width */
+
+    display: flex; /* Adicionado display flex */
+    flex-direction: column; /* Coloca os itens em coluna */
+    align-items: center; /* Centraliza os itens horizontalmente */
+}
+.carona-alert-section p {
+    margin-bottom: 1rem;
+    color: #555;
+    font-size: 1rem;
+    line-height: 1.5; /* Melhorar legibilidade */
+}
+
+/* Botão "Criar alerta" */
+.carona-alert-section .carona-button.secondary {
+    max-width: 200px; /* Largura desejada para o botão "Criar alerta" */
+    align-self: center; /* Centraliza o botão dentro do Flex container pai */
+    padding: 0.8rem 1rem; /* Ajuste do padding */
+    font-size: 1rem; /* Ajuste do tamanho da fonte */
+}
+
+/* Cards de Carona */
+.carona-card {
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.carona-header-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.5rem;
+}
+
+.carona-icon-card {
+    width: 30px;
+    height: 30px;
+}
+
+.carona-vagas {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 0.3rem 0.6rem;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.carona-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.carona-route {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.carona-arrow-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.carona-time-date {
+    font-size: 0.9rem;
+    color: #666;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.carona-ofertante {
+    font-size: 0.9rem;
+    color: #444;
+}
+
+.carona-description {
+    font-size: 0.85rem;
+    color: #777;
+    line-height: 1.4;
+}
+
+.carona-actions {
+    margin-top: 0.5rem;
+    text-align: right;
+}
+
+.no-vagas, .your-carona {
+    font-weight: bold;
+    color: #e63030;
+    font-size: 0.9rem;
+}
+.your-carona {
+    color: #0277bd;
+}
+
+/* Media Queries para responsividade */
+@media (max-width: 768px) {
+    .caronas-page {
+        padding: 0;
+    }
+    .caronas-header {
+        padding: 1.5rem 0.2rem;
+        border-radius: 0;
+        margin: 0;
+        width: 100%;
+        left: auto;
+        right: auto;
+        margin-left: 0;
+        margin-right: 0;
+    }
+    .caronas-header .home-header-content {
+        padding: 0; /* Colar no canto em mobile */
+        position: relative;
+        justify-content: space-between;
+    }
+    .caronas-header .left-header-group {
+        min-width: unset;
+        margin-left: 0; /* Colar no canto em mobile */
+        gap: 0.1rem;
+    }
+    .caronas-header .back-button {
+        margin-right: 0.1rem;
+        padding: 0.4rem;
+    }
+    .caronas-header .home-udesc-logo {
+        width: 60px;
+        height: auto;
+    }
+
+    .caronas-header .home-header-text {
+        position: static;
+        transform: none;
+        flex-grow: 1;
+        text-align: center;
+        padding: 0;
+    }
+    .caronas-header .right-header-group {
+        min-width: unset;
+        margin-right: 0; /* Colar no canto em mobile */
+    }
+    .caronas-header .offer-button-header {
+        display: none;
+    }
+    .caronas-header .offer-button-header img {
+        display: none;
+    }
+
+    .caronas-tab-buttons {
+        gap: 0.5rem;
+    }
+    .tab-button {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.9rem;
+    }
+    .tab-button .tab-icon {
+        width: 25px;
+        height: 25px;
+    }
+
+    /* Formulários em mobile */
+    .search-form-carona, .offer-form-carona {
+        gap: 0.8rem;
+        max-width: 100%;
+        padding: 0 1rem;
+    }
+    .search-form-carona input,
+    .offer-form-carona input,
+    .offer-form-carona textarea {
+        max-width: 100%;
+        font-size: 1rem;
+        padding: 0.7rem;
+    }
+    .search-form-carona button {
+        max-width: 100%;
+        padding: 0.8rem 1rem;
+        font-size: 1rem;
+    }
+
+    /* Mensagem e Alerta em mobile */
+    .initial-message {
+        max-width: 100%;
+        font-size: 1rem;
+        padding: 0.8rem;
+    }
+    .carona-alert-section {
+        max-width: 100%;
+        padding: 1.5rem 1rem;
+    }
+    .carona-alert-section .carona-button.secondary {
+        max-width: 100%;
+        padding: 0.6rem 0.8rem;
+        font-size: 0.9rem;
+    }
+
+    .caronas-list-grid {
+        grid-template-columns: 1fr;
+    }
+}

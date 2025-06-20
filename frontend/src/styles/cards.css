@@ -1,0 +1,114 @@
+/* frontend/src/styles/cards.css */
+
+.announcement-card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.2s ease-in-out;
+}
+
+.announcement-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Estilo para os cards de anúncio completo (padrão) */
+.full-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.announcement-image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.announcement-content {
+    padding: 1rem;
+}
+
+.announcement-content h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.announcement-meta {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+}
+
+.announcement-type,
+.announcement-location {
+    margin-right: 0.5rem;
+    font-weight: bold;
+}
+
+.announcement-author {
+    font-size: 0.85rem;
+    color: #777;
+    margin-bottom: 0.5rem;
+}
+
+.announcement-date {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+/* Estilo para os cards de recomendação (agora se adaptam ao grid) */
+.recommendation-card {
+    display: flex;
+    flex-direction: column; /* Conteúdo empilhado (imagem, texto, tag) */
+    align-items: flex-start;
+    /* Removido width fixo e flex-shrink: 0 para que ocupe o espaço do grid */
+    padding: 0.8rem;
+    gap: 0.5rem;
+    background-color: #e0f2f7; /* Cor de fundo para as recomendações */
+}
+
+/* Ajuste da imagem dentro do card de recomendação */
+.recommendation-image {
+    width: 100%; /* A imagem ocupa 100% da largura do card */
+    height: 120px; /* <--- Altura ajustada para ser menor que os cards full */
+    border-radius: 5px;
+    object-fit: cover;
+    margin-bottom: 0.5rem;
+}
+
+.announcement-author-rec,
+.author-pic-rec,
+.author-pic-placeholder-rec {
+    display: none;
+}
+
+.recommendation-description {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Tags de Anúncio */
+.announcement-tag {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    margin-top: 0.5rem;
+    text-transform: uppercase;
+}
+
+/* Cores de exemplo para tags */
+.livros { background-color: #e0f2f7; color: #0277bd; }
+.equipamentos { background-color: #e8f5e9; color: #2e7d32; }
+.caronas { background-color: #fff3e0; color: #ef6c00; }
+.aulas { background-color: #fce4ec; color: #ad1457; }
+/* ... (outras cores de tag) ... */

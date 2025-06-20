@@ -1,6 +1,6 @@
 /**
  * Classe CaronaController
- * 
+ *
  * Author: Elian
  * Data: 2025-05-15
  */
@@ -24,35 +24,36 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/caronas")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class CaronaController {
-    
+
     private final CaronaRepository caronaRepository;
     private final UsuarioRepository usuarioRepository;
     private final CaronaPassageiroRepository caronaPassageiroRepository;
     private final AvaliacaoCaronaRepository avaliacaoCaronaRepository;
-    
-    public CaronaController(CaronaRepository caronaRepository, 
-                          UsuarioRepository usuarioRepository,
-                          CaronaPassageiroRepository caronaPassageiroRepository,
-                          AvaliacaoCaronaRepository avaliacaoCaronaRepository) {
+
+    public CaronaController(CaronaRepository caronaRepository,
+                            UsuarioRepository usuarioRepository,
+                            CaronaPassageiroRepository caronaPassageiroRepository,
+                            AvaliacaoCaronaRepository avaliacaoCaronaRepository) {
         this.caronaRepository = caronaRepository;
         this.usuarioRepository = usuarioRepository;
         this.caronaPassageiroRepository = caronaPassageiroRepository;
         this.avaliacaoCaronaRepository = avaliacaoCaronaRepository;
     }
-    
-    // Ofertar carona (ID 07 do backlog)
+
+    // Ofertar carona (ID 07 do backlog) - Retorna CaronaDTO
     @PostMapping("/ofertar")
-    public ResponseEntity<Carona> ofertarCarona(@RequestBody OfertarCaronaRequest request) {
+    public ResponseEntity<CaronaDTO> ofertarCarona(@RequestBody OfertarCaronaRequest request) {
         Optional<Usuario> ofertanteOpt = usuarioRepository.findById(request.ofertanteId());
         if (ofertanteOpt.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
-        
+
         Carona carona = new Carona();
         carona.setOfertante(ofertanteOpt.get());
         carona.setOrigem(request.origem());
@@ -61,90 +62,109 @@ public class CaronaController {
         carona.setHorario(request.horario());
         carona.setVagas(request.vagas());
         carona.setDescricao(request.descricao());
-        
+
         Carona saved = caronaRepository.save(carona);
-        return ResponseEntity.ok(saved);
+        return ResponseEntity.ok(new CaronaDTO(saved));
     }
-    
-    // Procurar caronas (ID 06 do backlog)
+
+    // Procurar caronas (ID 06 do backlog) - Retorna lista de CaronaDTO
     @GetMapping("/procurar")
     public ResponseEntity<?> procurarCaronas(
-        @RequestParam(required = false) String origem,
-        @RequestParam(required = false) String destino,
-        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data) {
-    
-    try {
-        List<Carona> caronas = caronaRepository.findWithFilters(origem, destino, data);
-        
-        if (caronas.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Nenhuma carona encontrada com os critérios especificados");
+            @RequestParam(required = false) String origem,
+            @RequestParam(required = false) String destino,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data) {
+
+        try {
+            List<Carona> caronas = caronaRepository.findWithFilters(origem, destino, data);
+
+            if (caronas.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("Nenhuma carona encontrada com os critérios especificados");
+            }
+
+            List<CaronaDTO> caronaDTOs = caronas.stream()
+                                                .map(CaronaDTO::new)
+                                                .collect(Collectors.toList());
+
+            return ResponseEntity.ok(caronaDTOs);
+        } catch (Exception ex) {
+            return ResponseEntity.internalServerError()
+                    .body("Erro ao buscar caronas: " + ex.getMessage());
         }
-        
-        return ResponseEntity.ok(caronas);
-        
-    } catch (Exception ex) {
-        return ResponseEntity.internalServerError()
-                .body("Erro ao buscar caronas: " + ex.getMessage());
     }
+
+    // NOVO ENDPOINT: Listar todas as caronas disponíveis (para a aba principal)
+    @GetMapping
+    public ResponseEntity<List<CaronaDTO>> listarTodasCaronasDisponiveis() {
+        List<Carona> caronas = caronaRepository.findByVagasGreaterThan(0);
+        List<CaronaDTO> caronaDTOs = caronas.stream()
+                                            .map(CaronaDTO::new)
+                                            .collect(Collectors.toList());
+        return ResponseEntity.ok(caronaDTOs);
     }
-    
+
     // Cadastrar passageiro em carona
-   @PostMapping("/{caronaId}/passageiros/{passageiroId}")
+    @PostMapping("/{caronaId}/passageiros/{passageiroId}")
     public ResponseEntity<?> adicionarPassageiro(
-        @PathVariable Long caronaId,
-        @PathVariable Long passageiroId) {
-    
-    try {
-        Carona carona = caronaRepository.findById(caronaId)
-                .orElseThrow(() -> new EntityNotFoundException("Carona não encontrada"));
-                
-        Usuario passageiro = usuarioRepository.findById(passageiroId)
-                .orElseThrow(() -> new EntityNotFoundException("Passageiro não encontrado"));
+            @PathVariable Long caronaId,
+            @PathVariable Long passageiroId) {
 
-        if (caronaPassageiroRepository.existsById(new CaronaPassageiroId(caronaId, passageiroId))) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body("Passageiro já está nesta carona");
+        try {
+            Carona carona = caronaRepository.findById(caronaId)
+                    .orElseThrow(() -> new EntityNotFoundException("Carona não encontrada"));
+
+            Usuario passageiro = usuarioRepository.findById(passageiroId)
+                    .orElseThrow(() -> new EntityNotFoundException("Passageiro não encontrado"));
+
+            if (caronaPassageiroRepository.findByCaronaIdAndPassageiroId(caronaId, passageiroId).isPresent()) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body("Passageiro já está nesta carona");
+            }
+            
+            if (carona.getOfertante().getId().equals(passageiroId)) {
+                return ResponseEntity.badRequest()
+                        .body("Ofertante não pode se adicionar como passageiro na própria carona.");
+            }
+
+
+            if (carona.getVagas() <= 0) {
+                return ResponseEntity.badRequest()
+                        .body("Não há vagas disponíveis nesta carona");
+            }
+
+            CaronaPassageiro relacao = new CaronaPassageiro();
+            relacao.setId(new CaronaPassageiroId(caronaId, passageiroId));
+            relacao.setCarona(carona);
+            relacao.setPassageiro(passageiro);
+            relacao.setDataCadastro(LocalDate.now());
+
+            caronaPassageiroRepository.save(relacao);
+
+            carona.setVagas(carona.getVagas() - 1);
+            caronaRepository.save(carona);
+
+            return ResponseEntity.ok().build();
+
+        } catch (EntityNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ex.getMessage());
+        } catch (Exception ex) {
+            return ResponseEntity.internalServerError()
+                    .body("Erro ao adicionar passageiro: " + ex.getMessage());
         }
-
-        if (carona.getVagas() <= 0) {
-            return ResponseEntity.badRequest()
-                    .body("Não há vagas disponíveis nesta carona");
-        }
-
-        CaronaPassageiro relacao = new CaronaPassageiro();
-        relacao.setId(new CaronaPassageiroId(caronaId, passageiroId));
-        relacao.setCarona(carona);
-        relacao.setPassageiro(passageiro);
-        relacao.setDataCadastro(LocalDate.now());
-        
-        caronaPassageiroRepository.save(relacao);
-        
-        carona.setVagas(carona.getVagas() - 1);
-        caronaRepository.save(carona);
-        
-        return ResponseEntity.ok().build();
-        
-    } catch (EntityNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(ex.getMessage());
-    } catch (Exception ex) {
-        return ResponseEntity.internalServerError()
-                .body("Erro ao adicionar passageiro: " + ex.getMessage());
     }
-}
-    
-    // Avaliar carona (ID 08 do backlog)
+
+    // Avaliar carona (ID 08 do backlog) - Retorna AvaliacaoCaronaDTO
     @PostMapping("/avaliar")
-    public ResponseEntity<AvaliacaoCarona> avaliarCarona(@RequestBody AvaliarCaronaRequest request) {
+    public ResponseEntity<AvaliacaoCaronaDTO> avaliarCarona(@RequestBody AvaliarCaronaRequest request) {
         Optional<Carona> caronaOpt = caronaRepository.findById(request.caronaId());
         Optional<Usuario> avaliadorOpt = usuarioRepository.findById(request.avaliadorId());
         Optional<Usuario> avaliadoOpt = usuarioRepository.findById(request.avaliadoId());
-        
+
         if (caronaOpt.isEmpty() || avaliadorOpt.isEmpty() || avaliadoOpt.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
-        
+
         AvaliacaoCarona avaliacao = new AvaliacaoCarona();
         avaliacao.setCarona(caronaOpt.get());
         avaliacao.setAvaliador(avaliadorOpt.get());
@@ -152,58 +172,56 @@ public class CaronaController {
         avaliacao.setNota(request.nota());
         avaliacao.setComentario(request.comentario());
         avaliacao.setDataAvaliacao(LocalDate.now());
-        
+
         AvaliacaoCarona saved = avaliacaoCaronaRepository.save(avaliacao);
-        return ResponseEntity.ok(saved);
-    }
-    
-    // Listar avaliações recebidas por um usuário
-    @GetMapping("/avaliacoes/recebidas/{usuarioId}")
-    public ResponseEntity<?> getAvaliacoesRecebidas(@PathVariable Long usuarioId) {
-    if (!usuarioRepository.existsById(usuarioId)) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body("Usuário não encontrado com ID: " + usuarioId);
-    }
-    
-    List<AvaliacaoCarona> avaliacoes = avaliacaoCaronaRepository.findByAvaliadoId(usuarioId);
-    return ResponseEntity.ok(avaliacoes);
+        return ResponseEntity.ok(new AvaliacaoCaronaDTO(saved));
     }
 
-    // Listar avaliações feitas por um usuário
-    @GetMapping("/avaliacoes/feitas/{usuarioId}")
-    public ResponseEntity<List<AvaliacaoCarona>> getAvaliacoesFeitas(@PathVariable Long usuarioId) {
-        List<AvaliacaoCarona> avaliacoes = avaliacaoCaronaRepository.findByAvaliadorId(usuarioId);
-        return ResponseEntity.ok(avaliacoes);
+    // Listar avaliações recebidas por um usuário - CORRIGIDO O TIPO DE RETORNO
+    @GetMapping("/avaliacoes/recebidas/{usuarioId}")
+    public ResponseEntity<?> getAvaliacoesRecebidas(@PathVariable Long usuarioId) { // MUDADO PARA ResponseEntity<?>
+        if (!usuarioRepository.existsById(usuarioId)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Usuário não encontrado com ID: " + usuarioId);
+        }
+
+        List<AvaliacaoCarona> avaliacoes = avaliacaoCaronaRepository.findByAvaliadoId(usuarioId);
+        List<AvaliacaoCaronaDTO> avaliacaoDTOs = avaliacoes.stream()
+                                                        .map(AvaliacaoCaronaDTO::new)
+                                                        .collect(Collectors.toList());
+        return ResponseEntity.ok(avaliacaoDTOs);
     }
-    
+
+    // Listar avaliações feitas por um usuário - Retorna lista de AvaliacaoCaronaDTO
+    @GetMapping("/avaliacoes/feitas/{usuarioId}")
+    public ResponseEntity<List<AvaliacaoCaronaDTO>> getAvaliacoesFeitas(@PathVariable Long usuarioId) {
+        List<AvaliacaoCarona> avaliacoes = avaliacaoCaronaRepository.findByAvaliadorId(usuarioId);
+        List<AvaliacaoCaronaDTO> avaliacaoDTOs = avaliacoes.stream()
+                                                        .map(AvaliacaoCaronaDTO::new)
+                                                        .collect(Collectors.toList());
+        return ResponseEntity.ok(avaliacaoDTOs);
+    }
+
     // Criar alerta de carona (parte do ID 06 do backlog)
     @PostMapping("/alerta")
     public ResponseEntity<Void> criarAlertaCarona(@RequestBody AlertaCaronaRequest request) {
-        // Implementação simplificada - em produção, integrar com sistema de notificações
         return ResponseEntity.ok().build();
     }
 }
 
-// Classes de request (DTOs)
 record OfertarCaronaRequest(
     @NotNull(message = "ID do ofertante é obrigatório")
     Long ofertanteId,
-    
     @NotBlank(message = "Origem é obrigatória")
     String origem,
-    
     @NotBlank(message = "Destino é obrigatório")
     String destino,
-    
     @FutureOrPresent(message = "Data deve ser atual ou futura")
     LocalDate data,
-    
     @NotNull(message = "Horário é obrigatório")
     LocalTime horario,
-    
     @Min(value = 1, message = "Deve ter pelo menos 1 vaga")
     Integer vagas,
-    
     String descricao
 ) {}
 

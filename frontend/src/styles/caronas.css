@@ -13,24 +13,27 @@
 .caronas-header {
     background: #216a3a;
     color: white;
-    padding: 1.5rem 0; /* Removendo padding lateral aqui para colar os extremos */
+    padding: 1rem 1rem; /* Padding vertical e horizontal para toda a área verde */
     margin: -1rem -1rem 2rem -1rem;
     border-radius: 0 0 10px 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    position: relative;
     z-index: 10;
+    display: flex;
+    align-items: center; /* Centraliza verticalmente o caronas-header-content */
+    justify-content: center; /* Centraliza horizontalmente o caronas-header-content */
 }
 
+
 /* Conteúdo interno do cabeçalho */
-.caronas-header .home-header-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0; /* Removendo padding lateral aqui para colar os extremos */
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    position: relative;
+.caronas-header .caronas-header-content {
+    width: 100%; /* Ocupa a largura total disponível dentro do padding do .caronas-header */
+    /* REMOVER max-width e margin: 0 auto; daqui */
+    display: flex; /* Torna o content um container flex */
+    align-items: center; /* Alinha itens verticalmente no centro */
+    justify-content: space-between; /* Empurra os itens para as extremidades */
+    position: relative; /* ESSENCIAL para o posicionamento absoluto do título */
+    height: auto; /* Deixa a altura ser definida pelo conteúdo */
+    /* REMOVER padding: 0 1rem; daqui, pois o pai já tem o padding lateral */
 }
 
 /* Grupo para o botão de voltar e a logo no canto esquerdo */
@@ -39,9 +42,8 @@
     align-items: center;
     gap: 0.2rem; /* Espaço entre o botão e a logo */
     flex-shrink: 0;
-    min-width: fit-content; /* Ajusta a largura ao conteúdo */
-    /* Removendo margin-left aqui para colar no canto */
-    margin-left: 0; 
+    /* Remove os posicionamentos absolutos aqui, voltamos ao fluxo flexbox */
+    /* top, left, transform, etc., removidos */
     z-index: 2;
 }
 
@@ -66,22 +68,20 @@
 }
 
 .caronas-header .home-udesc-logo {
-    width: 120px; /* Tamanho da logo no cabeçalho */
+    width: 180px; /* Tamanho da logo no cabeçalho */
     height: auto;
     flex-shrink: 0;
 }
 
 /* Título da Página - Centralizado */
 .caronas-header .home-header-text {
-    flex-grow: 1; /* Permite que o título ocupe o espaço central */
-    text-align: center;
-    /* Para centralizar perfeitamente no espaço disponível */
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    width: fit-content; /* Ocupa apenas o espaço do conteúdo */
-    white-space: nowrap; /* Evita que o texto quebre linha */
-    z-index: 1; /* Garante que o título esteja acima de outros elementos na mesma linha */
+    width: fit-content;
+    white-space: nowrap;
+    z-index: 1;
+    text-align: center;
 }
 
 .caronas-header .home-welcome-greeting {
@@ -98,9 +98,7 @@
     align-items: center;
     gap: 0.5rem;
     flex-shrink: 0;
-    min-width: fit-content; /* Ajusta a largura ao conteúdo */
-    /* Removendo margin-right aqui para colar no canto */
-    margin-right: 0;
+    min-width: 150px; /* AJUSTAR ESTE VALOR se necessário */
     z-index: 2;
 }
 
@@ -377,44 +375,37 @@
         padding: 0;
     }
     .caronas-header {
-        padding: 1.5rem 0.2rem;
+        padding: 0.8rem 0.8rem; /* Padding lateral menor para mobile */
         border-radius: 0;
         margin: 0;
         width: 100%;
-        left: auto;
-        right: auto;
-        margin-left: 0;
-        margin-right: 0;
     }
-    .caronas-header .home-header-content {
-        padding: 0; /* Colar no canto em mobile */
-        position: relative;
-        justify-content: space-between;
+
+    .caronas-header .caronas-header-content {
+        height: auto;
     }
+    /* Mantenha o posicionamento absoluto para os grupos em mobile */
     .caronas-header .left-header-group {
-        min-width: unset;
-        margin-left: 0; /* Colar no canto em mobile */
         gap: 0.1rem;
     }
     .caronas-header .back-button {
         margin-right: 0.1rem;
-        padding: 0.4rem;
+        padding: 0.3rem;
     }
     .caronas-header .home-udesc-logo {
-        width: 60px;
-        height: auto;
+        width: 90px;
     }
 
     .caronas-header .home-header-text {
-        position: static;
-        transform: none;
-        flex-grow: 1;
-        text-align: center;
-        padding: 0;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        white-space: nowrap;
+        font-size: 1.4rem;
     }
+
     .caronas-header .right-header-group {
-        min-width: unset;
-        margin-right: 0; /* Colar no canto em mobile */
+        min-width: 70px; /* Ajuste para mobile, menor que desktop */
     }
     .caronas-header .offer-button-header {
         display: none;

@@ -252,7 +252,7 @@ export default function CaronasPage() {
     return (
         <div className="caronas-page">
             <header className="caronas-header">
-                <div className="home-header-content">
+                <div className="caronas-header-content">
                     {/* Botão de Voltar e Logo UDESC no canto esquerdo */}
                     <div className="left-header-group">
                         <button onClick={handleGoBack} className="back-button">

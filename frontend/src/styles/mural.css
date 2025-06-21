@@ -1,0 +1,210 @@
+/* frontend/src/styles/mural.css */
+
+.mural-page {
+    padding: 1rem;
+    margin: 0 auto;
+    background-color: #f9f9f9;
+    min-height: 80vh;
+    width: 100%;
+}
+
+.mural-content-area {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    width: 100%;
+    max-width: 900px; /* Largura máxima para o conteúdo da página */
+    margin-left: auto;
+    margin-right: auto;
+    box-sizing: border-box; /* Garante que padding não aumente a largura total */
+}
+
+.mural-content-area h2 {
+    text-align: center;
+    color: #216a3a;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+}
+
+/* --- Mural Form Styles --- */
+.mural-form-container {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #eee;
+}
+
+.mural-form-container h3 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+.mural-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 600px; /* Largura para o formulário */
+    margin: 0 auto;
+}
+
+.mural-form input[type="text"],
+.mural-form textarea {
+    padding: 0.9rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.mural-form textarea {
+    resize: vertical; /* Permite redimensionar verticalmente */
+    min-height: 100px;
+}
+
+.mural-button {
+    padding: 1rem 1.5rem;
+    border-radius: 5px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+    width: 100%;
+    max-width: 250px; /* Largura do botão */
+    align-self: center; /* Centraliza o botão dentro do form flex */
+}
+
+.mural-button.primary {
+    background-color: #216a3a;
+    color: white;
+}
+.mural-button.primary:hover {
+    background-color: #1a512d;
+}
+
+/* --- Mural Card Grid Styles --- */
+.mural-publications-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* 2 a 3 colunas em desktop, 1 em mobile */
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+/* --- Mural Card Individual Styles --- */
+.mural-card {
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+    padding: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    border: 1px solid #e0e0e0;
+}
+
+.mural-card-title {
+    font-size: 1.3rem;
+    color: #216a3a;
+    margin-bottom: 0.5rem;
+}
+
+.mural-card-category {
+    font-size: 0.9rem;
+    color: #666;
+    background-color: #e6ffe6; /* Um verde claro para a categoria */
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    align-self: flex-start; /* Alinha a pílula da categoria à esquerda */
+    margin-bottom: 0.5rem;
+}
+
+.mural-card-content {
+    font-size: 1rem;
+    color: #333;
+    line-height: 1.5;
+    flex-grow: 1; /* Permite que o conteúdo ocupe o espaço disponível */
+}
+
+.mural-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end; /* Alinha no final verticalmente */
+    margin-top: 1rem;
+    padding-top: 0.8rem;
+    border-top: 1px dashed #ddd;
+    font-size: 0.85rem;
+    color: #777;
+}
+
+/* Mensagens de feedback */
+.info-message,
+.no-results-message,
+.success-message,
+.error-message {
+    text-align: center;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+    font-size: 1rem;
+}
+
+.info-message {
+    background-color: #e0f7fa;
+    color: #006064;
+}
+
+.no-results-message {
+    background-color: #f0f0f0;
+    color: #888;
+}
+
+.success-message {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+    .mural-page {
+        padding: 0;
+    }
+    .mural-content-area {
+        padding: 1rem;
+        border-radius: 0;
+    }
+    .mural-content-area h2 {
+        font-size: 1.5rem;
+    }
+    .mural-form {
+        max-width: 100%;
+        padding: 0 0.5rem;
+    }
+    .mural-button {
+        max-width: 100%;
+    }
+    .mural-publications-grid {
+        grid-template-columns: 1fr; /* Uma coluna em mobile */
+        gap: 1rem;
+    }
+    .mural-card-title {
+        font-size: 1.1rem;
+    }
+    .mural-card-content {
+        font-size: 0.9rem;
+    }
+    .mural-card-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+    }
+}

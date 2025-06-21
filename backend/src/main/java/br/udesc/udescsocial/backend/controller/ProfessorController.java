@@ -7,11 +7,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import java.util.Optional;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/professores")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class ProfessorController {
 
     private final ProfessorRepository professorRepository;
@@ -70,6 +71,15 @@ public class ProfessorController {
             return ResponseEntity.internalServerError()
                 .body("Erro ao buscar professor: " + ex.getMessage());
         }
+    }
+
+    @GetMapping("/by-usuario/{usuarioId}")
+    public ResponseEntity<?> findByUsuarioId(@PathVariable Long usuarioId) {
+        Optional<Professor> professorOpt = professorRepository.findByUsuarioId(usuarioId);
+        if (professorOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Professor não encontrado para o usuário ID: " + usuarioId);
+        }
+        return ResponseEntity.ok(professorOpt.get().getId());
     }
 
     @GetMapping

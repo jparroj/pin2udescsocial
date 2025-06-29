@@ -17,7 +17,7 @@ import org.springframework.data.domain.Sort;
 
 @RestController
 @RequestMapping("/api/home")
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+//@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class HomeController {
 
     private final AnuncioRepository anuncioRepository;
@@ -28,7 +28,7 @@ public class HomeController {
 
     @GetMapping
     public ResponseEntity<HomeDTO> getHomeData(
-            @RequestParam(defaultValue = "6") int quantidadeAnuncios) {
+            @RequestParam(defaultValue = "8") int quantidadeAnuncios) {
         try {
             HomeDTO homeData = new HomeDTO(
                 getAnunciosRecentes(quantidadeAnuncios),

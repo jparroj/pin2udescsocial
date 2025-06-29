@@ -1,9 +1,3 @@
-/**
- * Classe MuralController
- * 
- * Usuario: Lucas Eduardo
-
- */
 package br.udesc.udescsocial.backend.controller;
 
 import br.udesc.udescsocial.backend.entity.*;
@@ -13,14 +7,16 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.transaction.annotation.Transactional; // Adicione este import
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/mural")
-@CrossOrigin(origins = "*")
+@RequestMapping("/api/mural")
+//@CrossOrigin(origins = "*")
 public class MuralController {
 
     private final MuralRepository muralRepository;
@@ -31,7 +27,6 @@ public class MuralController {
         this.professorRepository = professorRepository;
     }
 
-    // Endpoint para cadastrar um novo mural com informações distintas.
     @PostMapping("/cadastrar")
     public ResponseEntity<?> cadastrarMural(@RequestBody @Valid MuralRequest request) {
         Optional<Professor> autorOpt = professorRepository.findById(request.autorId());
@@ -51,10 +46,20 @@ public class MuralController {
         return ResponseEntity.ok(salvo.getId());
     }
 
-    // Endpoint para listar todos os murais (ordenados pela data de postagem)
+    // AQUI ESTÁ A MUDANÇA: Adicione @Transactional(readOnly = true)
     @GetMapping("/murais")
-    public ResponseEntity<List<Mural>> listarMurais() {
+    @Transactional(readOnly = true) // Garante que a sessão do banco de dados esteja aberta
+                                   // durante toda a execução deste método e a conversão para DTO
+    public ResponseEntity<List<MuralResponseDTO>> listarMurais() {
         List<Mural> murais = muralRepository.findAllByOrderByDataPublicacaoDesc();
-        return ResponseEntity.ok(murais);
+        
+        // Converte as entidades Mural para DTOs DENTRO da transação
+        // Isso garante que os campos LAZY (como 'conteudo' e 'autor.usuario.nome')
+        // sejam acessados enquanto a sessão do Hibernate está ativa.
+        List<MuralResponseDTO> muraisDTO = murais.stream()
+            .map(MuralResponseDTO::new)
+            .collect(Collectors.toList());
+            
+        return ResponseEntity.ok(muraisDTO);
     }
 }

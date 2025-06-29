@@ -90,7 +90,6 @@ export default function WelcomePage() {
                 </form>
 
                 <div className="login-footer">
-                    <span>Ou</span>
                     <img src="/logo-s.png" alt="Logo S" className="logo-s" />
                 </div>
             </section>

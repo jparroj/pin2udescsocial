@@ -1,149 +1,124 @@
-// frontend/src/pages/MuralDocentesPage.jsx
+// frontend/src/pages/LivrosPage.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
-import * as muralService from '../services/muralService';
-import MuralCard from '../components/MuralCard';
-import MuralForm from '../components/MuralForm';
+import * as anunciosService from '../services/anunciosService'; // Serviço unificado
+import AnuncioCard from '../components/AnuncioCard'; // Novo card para publicações
+import PublicationForm from '../components/PublicationForm'; // Novo formulário para publicações
 import { useNavigate } from 'react-router-dom';
 
-import '../styles/mural.css';
-import '../styles/global.css'; 
-import '../styles/caronas.css';
+import '../styles/publicacoes.css'; // Estilos para a página e cards
+import '../styles/global.css';
+import '../styles/caronas.css'; // Para o cabeçalho (reutilizando estilos)
 
-export default function MuralDocentesPage() {
+export default function LivrosPage() {
     const { user, loading: authLoading } = useAuth();
     const [publications, setPublications] = useState([]);
     const [loadingPublications, setLoadingPublications] = useState(true);
     const [errorPublications, setErrorPublications] = useState(null);
     const [formStatus, setFormStatus] = useState({ loading: false, error: null, success: null });
-    const [professorId, setProfessorId] = useState(null);
     const [showCreateModal, setShowCreateModal] = useState(false);
 
     const navigate = useNavigate();
+
+    // Tipo de publicação específico para esta página
+    const PUBLICATION_TYPE = "MATERIAL"; // Corresponde ao tipo 'MATERIAL' no backend para livros/materiais
 
     const loadPublications = useCallback(async () => {
         setLoadingPublications(true);
         setErrorPublications(null);
         try {
-            const data = await muralService.fetchMuralPublications();
+            const data = await anunciosService.fetchAnuncios(PUBLICATION_TYPE);
             setPublications(data);
         } catch (err) {
-            console.error("Erro ao carregar publicações:", err);
-            setErrorPublications(err.message || "Erro ao carregar publicações.");
+            console.error("Erro ao carregar livros/materiais:", err);
+            setErrorPublications(err.message || "Erro ao carregar livros e materiais.");
         } finally {
             setLoadingPublications(false);
         }
-    }, []);
+    }, [PUBLICATION_TYPE]); // Dependência em PUBLICATION_TYPE
 
     useEffect(() => {
         loadPublications();
     }, [loadPublications]);
 
-    useEffect(() => {
-        const getProfessorId = async () => {
-            if (!authLoading && user && user.tipo === 'PROFESSOR') {
-                try {
-                    const profId = await muralService.fetchProfessorIdByUserId(user.id);
-                    setProfessorId(profId);
-                } catch (err) {
-                    console.error("MuralDocentesPage - Erro ao obter o ID do professor:", err);
-                    setErrorPublications("Não foi possível carregar suas informações de professor para criar publicações.");
-                }
-            }
-        };
-        getProfessorId();
-    }, [authLoading, user]);
-
     const handleCreatePublication = async (formData) => {
-        if (!user || user.tipo !== 'PROFESSOR') {
-            alert("Apenas professores podem criar publicações.");
-            return;
-        }
-        if (!professorId) {
-            alert("Seu ID de professor não foi carregado. Não é possível publicar.");
+        if (!user || !user.id) {
+            alert("Você precisa estar logado para publicar.");
             return;
         }
 
         setFormStatus({ loading: true, error: null, success: null });
         try {
             const dataToSend = {
-                autorId: professorId,
+                autorId: user.id, // Qualquer usuário logado pode publicar
+                tipo: PUBLICATION_TYPE, // Define o tipo para o backend
                 titulo: formData.titulo,
-                categoria: formData.categoria,
-                conteudo: formData.conteudo,
+                descricao: formData.descricao,
+                local: formData.local,
+                quantidade: formData.quantidade,
+                fotos: formData.fotos,
             };
-            await muralService.createMuralPublication(dataToSend);
-            setFormStatus({ loading: false, error: null, success: "Publicação criada com sucesso!" });
+            await anunciosService.createAnuncio(dataToSend);
+            setFormStatus({ loading: false, error: null, success: "Livro/Material publicado com sucesso!" });
             loadPublications();
             setShowCreateModal(false);
             setTimeout(() => setFormStatus({ loading: false, error: null, success: null }), 3000);
         } catch (err) {
-            setFormStatus({ loading: false, error: err.message || "Erro ao criar publicação.", success: null });
+            setFormStatus({ loading: false, error: err.message || "Erro ao publicar livro/material.", success: null });
         }
     };
 
-    // Função para voltar para a HomePage (mantida do cabeçalho de caronas)
     const handleGoBack = () => {
         navigate('/home');
     };
-
-    const isProfessor = user && user.tipo === 'PROFESSOR';
 
     if (authLoading) {
         return <div className="loading">Carregando informações do usuário...</div>;
     }
 
     return (
-        <div className="mural-page">
-            {/* CABEÇALHO DO MURAL - AGORA IGUAL AO DE CARONAS */}
+        <div className="publicacao-page">
             <header className="caronas-header">
                 <div className="caronas-header-content">
-                    {/* Botão de Voltar e Logo UDESC no canto esquerdo */}
                     <div className="left-header-group">
                         <button onClick={handleGoBack} className="back-button">
                             <img src="/icons/arrow-left.png" alt="Voltar" style={{ width: '24px', height: '24px' }} />
                         </button>
                         <img src="/udesc-logo.png" alt="UDESC Logo" className="home-udesc-logo" />
                     </div>
-
-                    {/* Título da Página - Centralizado */}
                     <div className="home-header-text">
-                        <p className="home-welcome-greeting">Mural dos Docentes</p>
+                        <p className="home-welcome-greeting">Livros e Materiais</p>
                     </div>
-
-                    {/* O lado direito do cabeçalho ficará vazio, mas manterá as classes para balanceamento */}
-                    <div className="right-header-group">
-                        {/* Conteúdo vazio aqui */}
-                    </div>
+                    <div className="right-header-group"></div>
                 </div>
             </header>
 
-            <div className="mural-content-area">
-                {isProfessor && professorId && (
-                    <div className="mural-actions-top">
+            <div className="publicacao-content-area">
+                {user && ( // Qualquer usuário logado pode criar
+                    <div className="publicacao-actions-top">
                         <button
                             onClick={() => setShowCreateModal(true)}
-                            className="mural-button primary"
+                            className="publicacao-button primary"
                         >
-                            + Nova Publicação
+                            + Novo Livro/Material
                         </button>
                         {formStatus.success && <p className="success-message">{formStatus.success}</p>}
                         {formStatus.error && <p className="error-message">{formStatus.error}</p>}
                     </div>
                 )}
-
-                <h2>Publicações Recentes</h2>
+                
+                <h2>Livros e Materiais Recentes</h2>
 
                 {loadingPublications ? (
-                    <div className="loading">Carregando publicações...</div>
+                    <div className="loading">Carregando livros e materiais...</div>
                 ) : errorPublications ? (
                     <div className="error-message">{errorPublications}</div>
                 ) : publications.length === 0 ? (
-                    <p className="no-results-message">Nenhuma publicação encontrada no mural.</p>
+                    <p className="no-results-message">Nenhum livro ou material encontrado.</p>
                 ) : (
-                    <div className="mural-publications-grid">
-                        {publications.map((publication) => (
-                            <MuralCard key={publication.id} publication={publication} />
+                    <div className="publicacao-grid">
+                        {publications.map((anuncio) => (
+                            <AnuncioCard key={anuncio.id} anuncio={anuncio} />
                         ))}
                     </div>
                 )}
@@ -155,11 +130,12 @@ export default function MuralDocentesPage() {
                         <button className="modal-close-button" onClick={() => setShowCreateModal(false)}>
                             &times;
                         </button>
-                        <MuralForm
+                        <PublicationForm
                             onSubmit={handleCreatePublication}
                             loading={formStatus.loading}
                             error={formStatus.error}
                             successMessage={formStatus.success}
+                            publicationType={PUBLICATION_TYPE} // Passa o tipo para o formulário
                         />
                     </div>
                 </div>

@@ -3,8 +3,7 @@ package br.udesc.udescsocial.backend.entity;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity  //indica que esta classe é uma entidade persistente que será mapeada para uma tabela no banco de dados.
 public class Anuncio {
@@ -40,7 +39,7 @@ public class Anuncio {
     //orphanRemoval = true remove fotos "órfãs" (quando removidas da lista)
     //@JsonIgnore evita serialização JSON infinita (quando transforma em JSON)
     @OneToMany(mappedBy = "anuncio", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
+    @JsonManagedReference 
     private List<AnuncioFoto> fotos;
 
     // Getters e Setters

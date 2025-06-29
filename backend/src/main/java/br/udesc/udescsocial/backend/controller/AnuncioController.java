@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController//Indica que esta classe é um controller REST
-@RequestMapping("/anuncios")//Define que todas as rotas começam com /anuncios
-@CrossOrigin(origins = "*")//Permite requisições de qualquer origem
+@RequestMapping("/api/anuncios")//Define que todas as rotas começam com /anuncios
+//@CrossOrigin(origins = "*")//Permite requisições de qualquer origem
 public class AnuncioController {
     
     private final AnuncioRepository anuncioRepository;//Para operações com anúncios
@@ -33,22 +33,17 @@ public class AnuncioController {
 public ResponseEntity<?> listarAnuncios(
     @RequestParam(required = false) String tipo) {
     
-    try {
-        // Usando o método com apenas o parâmetro tipo
-        List<Anuncio> anuncios = anuncioRepository.findWithFilters(tipo);
+        try {
+            List<Anuncio> anuncios = anuncioRepository.findWithFilters(tipo);
+
+            return ResponseEntity.ok(anuncios);
+            
+        } catch (Exception ex) {
         
-        if (anuncios.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Nenhum anúncio encontrado com os critérios especificados");
+            return ResponseEntity.internalServerError()
+                    .body("Erro ao buscar anúncios: " + ex.getMessage());
         }
-        
-        return ResponseEntity.ok(anuncios);
-        
-    } catch (Exception ex) {
-        return ResponseEntity.internalServerError()
-                .body("Erro ao buscar anúncios: " + ex.getMessage());
     }
-}
     
     @PostMapping// Criar novo anúncio -> POST /anuncios
     @Transactional

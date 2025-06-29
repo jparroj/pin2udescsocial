@@ -27,8 +27,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/caronas")
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+@RequestMapping("/api/caronas")
+//@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class CaronaController {
 
     private final CaronaRepository caronaRepository;

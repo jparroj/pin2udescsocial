@@ -16,11 +16,11 @@ export default function AnnouncementCard({ anuncio, type = 'full' }) {
         />
       )}
       <div className="announcement-content">
-        {/* ... código existente ... */}
+        {}
         
-        {/* Linha corrigida: Removido o escape desnecessário para o ponto */}
+        {}
         <div className={`announcement-tag ${anuncio.tipo.toLowerCase().replace(/[\s.]/g, '-')}`}>{anuncio.tipo}</div>
-        {/* Ou, se o tipo puder ter outros caracteres especiais que você também queira substituir, poderia ser mais abrangente, ex: replace(/[^a-z0-9]/g, '-') */}
+        {}
 
       </div>
     </div>

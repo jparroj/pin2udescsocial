@@ -1,63 +1,82 @@
 // frontend/src/App.jsx
-import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from './context/AuthContext';
+// Remova o BrowserRouter de novo, se você o adicionou de volta por engano.
+// import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; // Remova este import completo se ele tiver sido adicionado de volta.
+import { Routes, Route, Navigate } from 'react-router-dom'; // Mantenha apenas este.
+import { AuthProvider, useAuth } from './context/AuthContext'; 
+// import LoginPage from './pages/LoginPage'; // Remova esta importação (se você não usa mais ela para login)
+import WelcomePage from './pages/WelcomePage'; // <--- IMPORTE O SEU WELCOMEPAGE
 
-import WelcomePage from './pages/WelcomePage';
-import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
-// Certifique-se que CaronasPage está importado
-import CaronasPage from './pages/CaronasPage'; 
-// --- NOVO IMPORT ---
-import MuralDocentesPage from './pages/MuralDocentesPage'; // <-- Importe MuralDocentesPage
+import MuralDocentesPage from './pages/MuralDocentesPage';
+import CaronasPage from './pages/CaronasPage';
+import LivrosPage from './pages/LivrosPage';
+import AnunciosPage from './pages/AnunciosPage';
 
-import Footer from './components/Footer';
+const PrivateRoute = ({ children }) => {
+    const { isAuthenticated, loading } = useAuth();
 
-import './styles/global.css'; // Mantenha o import dos estilos globais
-// --- NOVO IMPORT (se não estiver em global.css) ---
-import './styles/mural.css'; // <-- Importe os estilos do mural
+    if (loading) {
+        return <div className="loading">Verificando autenticação...</div>;
+    }
 
-function ProtectedRoute({ children }) {
-  const { isAuthenticated, loading } = useAuth();
-  if (loading) return <div>Carregando...</div>;
-  return isAuthenticated ? children : <Navigate to="/login" replace />;
-}
+    return isAuthenticated ? children : <Navigate to="/login" />;
+};
 
 function App() {
-  return (
-    <div className="app-container">
-      <div className="main-content-wrapper">
-        <Routes>
-          <Route path="/" element={<WelcomePage />} />
-          <Route path="/login" element={<LoginPage />} />
-
-          <Route path="/home" element={
-            <ProtectedRoute>
-              <HomePage />
-            </ProtectedRoute>
-          } />
-
-          {/* Rota para a Página de Caronas */}
-          <Route path="/caronas" element={
-            <ProtectedRoute>
-              <CaronasPage />
-            </ProtectedRoute>
-          } />
-
-          {/* --- NOVA ROTA PARA MURAL DOS DOCENTES --- */}
-          <Route path="/mural-docentes" element={
-            <ProtectedRoute>
-              <MuralDocentesPage />
-            </ProtectedRoute>
-          } />
-
-          {/* Rota de fallback */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </div>
-      <Footer />
-    </div>
-  );
+    return (
+        // O Router DEVE ESTAR APENAS NO main.jsx (ou index.js)
+        // Se você o removeu do App.jsx na última instrução, não o adicione de volta.
+        // Se ainda estiver aqui, remova-o novamente.
+        <AuthProvider>
+            <Routes>
+                {/* ALTERE AQUI: Use WelcomePage no lugar de LoginPage */}
+                <Route path="/login" element={<WelcomePage />} /> 
+                
+                <Route path="/" element={<Navigate to="/home" />} />
+                <Route
+                    path="/home"
+                    element={
+                        <PrivateRoute>
+                            <HomePage />
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/mural-docentes"
+                    element={
+                        <PrivateRoute>
+                            <MuralDocentesPage />
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/caronas"
+                    element={
+                        <PrivateRoute>
+                            <CaronasPage />
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/livros"
+                    element={
+                        <PrivateRoute>
+                            <LivrosPage />
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/anuncios"
+                    element={
+                        <PrivateRoute>
+                            <AnunciosPage />
+                        </PrivateRoute>
+                    }
+                />
+                <Route path="*" element={<p>404 Not Found</p>} />
+            </Routes>
+        </AuthProvider>
+    );
 }
 
 export default App;

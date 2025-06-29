@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List; // Necessário para listarTodosUsuarios
 
 @RestController
-@RequestMapping("/login")
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+@RequestMapping("/api/login")
+//@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class LoginController {
 
     private final UsuarioRepository repository;

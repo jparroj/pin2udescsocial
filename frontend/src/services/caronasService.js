@@ -1,10 +1,11 @@
 // frontend/src/services/caronasService.js
 
-const API_BASE = 'http://localhost:8010/caronas'; // Rota base do CaronaController
+// Única base para todos os endpoints da API
+const API_BASE_URL = '/api'; 
 
 export const fetchAllCaronas = async () => {
     try {
-        const response = await fetch(API_BASE, { // GET para /caronas
+        const response = await fetch(`${API_BASE_URL}/caronas`, { // Gera /api/caronas
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include'
@@ -25,15 +26,15 @@ export const searchCaronas = async (origem, destino, data) => {
         const params = new URLSearchParams();
         if (origem) params.append('origem', origem);
         if (destino) params.append('destino', destino);
-        if (data) params.append('data', data); // Data deve estar no formato YYYY-MM-DD
+        if (data) params.append('data', data);
 
-        const response = await fetch(`${API_BASE}/procurar?${params.toString()}`, {
+        const response = await fetch(`${API_BASE_URL}/caronas/procurar?${params.toString()}`, { // Gera /api/caronas/procurar
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include'
         });
         if (!response.ok) {
-            const errorBody = await response.text(); // Pode ser texto simples
+            const errorBody = await response.text();
             throw new Error(errorBody || 'Falha ao procurar caronas');
         }
         return await response.json();
@@ -45,7 +46,7 @@ export const searchCaronas = async (origem, destino, data) => {
 
 export const offerCarona = async (caronaData) => {
     try {
-        const response = await fetch(`${API_BASE}/ofertar`, {
+        const response = await fetch(`${API_BASE_URL}/caronas/ofertar`, { // Gera /api/caronas/ofertar
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(caronaData),
@@ -64,7 +65,7 @@ export const offerCarona = async (caronaData) => {
 
 export const addPassenger = async (caronaId, passageiroId) => {
     try {
-        const response = await fetch(`${API_BASE}/${caronaId}/passageiros/${passageiroId}`, {
+        const response = await fetch(`${API_BASE_URL}/caronas/${caronaId}/passageiros/${passageiroId}`, { // Gera /api/caronas/{id}/passageiros/{id}
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include'
@@ -73,8 +74,9 @@ export const addPassenger = async (caronaId, passageiroId) => {
             const errorBody = await response.text();
             throw new Error(errorBody || 'Falha ao adicionar passageiro');
         }
-        return response.ok; // Retorna true se 200 OK
-    } catch (error) {
+        return response.ok;
+    }
+    catch (error) {
         console.error('Erro ao adicionar passageiro:', error);
         throw error;
     }
@@ -82,7 +84,7 @@ export const addPassenger = async (caronaId, passageiroId) => {
 
 export const fetchReceivedEvaluations = async (userId) => {
     try {
-        const response = await fetch(`${API_BASE}/avaliacoes/recebidas/${userId}`, {
+        const response = await fetch(`${API_BASE_URL}/caronas/avaliacoes/recebidas/${userId}`, { // Gera /api/caronas/avaliacoes/recebidas/{userId}
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include'
@@ -100,7 +102,7 @@ export const fetchReceivedEvaluations = async (userId) => {
 
 export const fetchMadeEvaluations = async (userId) => {
     try {
-        const response = await fetch(`${API_BASE}/avaliacoes/feitas/${userId}`, {
+        const response = await fetch(`${API_BASE_URL}/caronas/avaliacoes/feitas/${userId}`, { // Gera /api/caronas/avaliacoes/feitas/{userId}
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include'
@@ -118,7 +120,7 @@ export const fetchMadeEvaluations = async (userId) => {
 
 export const evaluateCarona = async (evaluationData) => {
     try {
-        const response = await fetch(`${API_BASE}/avaliar`, {
+        const response = await fetch(`${API_BASE_URL}/caronas/avaliar`, { // Gera /api/caronas/avaliar
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(evaluationData),
@@ -137,7 +139,7 @@ export const evaluateCarona = async (evaluationData) => {
 
 export const createCaronaAlert = async (alertData) => {
     try {
-        const response = await fetch(`${API_BASE}/alerta`, {
+        const response = await fetch(`${API_BASE_URL}/caronas/alerta`, { // Gera /api/caronas/alerta
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(alertData),
@@ -147,7 +149,7 @@ export const createCaronaAlert = async (alertData) => {
             const errorData = await response.json().catch(() => ({ message: 'Erro desconhecido' }));
             throw new Error(errorData.message || 'Falha ao criar alerta de carona');
         }
-        return response.ok; // Retorna true se 200 OK
+        return response.ok;
     } catch (error) {
         console.error('Erro ao criar alerta de carona:', error);
         throw error;

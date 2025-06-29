@@ -1,6 +1,7 @@
 package br.udesc.udescsocial.backend.entity;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity// indica que esta classe é uma entidade persistente que será mapeada para uma tabela no banco de dados.
 public class AnuncioFoto {
@@ -10,10 +11,11 @@ public class AnuncioFoto {
     
     @ManyToOne//Indica que muitas fotos podem pertencer a um anúncio
     @JoinColumn(name = "anuncio_id", nullable = false)//Especifica o nome da coluna de junção (anuncio_id) 
-    private Anuncio anuncio;                        //e que não pode ser nula Isso cria uma relação 
-                                                    //com a entidade Anuncio
+    @JsonBackReference
+    private Anuncio anuncio;                        
+                                                    
     
-                                                    @Column(nullable = false)//nullable = false indica que é um campo obrigatório
+    @Column(nullable = false)//nullable = false indica que é um campo obrigatório
     private String urlImagem;//Armazena o caminho/URL da imagem
 
     // Getters e Setters

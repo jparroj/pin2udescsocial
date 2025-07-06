@@ -1,5 +1,3 @@
-/* frontend/src/styles/publicacoes.css */
-
 .publicacao-page {
     padding: 0;
     margin: 0 auto;
@@ -7,9 +5,6 @@
     min-height: 80vh;
     width: 100%;
 }
-
-/* Os estilos de cabeçalho (.caronas-header, .caronas-header-content, etc.)
-   serão puxados do `caronas.css` que é importado nas respectivas páginas. */
 
 .publicacao-content-area {
     background-color: white;
@@ -31,7 +26,6 @@
     font-size: 1.8rem;
 }
 
-/* ESTILOS PARA BOTÕES DE AÇÃO SUPERIOR (LIVROS/ANÚNCIOS) */
 .publicacao-actions-top {
     text-align: right;
     margin-bottom: 1.5rem;
@@ -40,17 +34,16 @@
     position: relative;
     width: 100%;
     box-sizing: border-box;
-    padding-right: 1.5rem; /* Adiciona padding para o botão não colar na borda direita do .publicacao-content-area */
-    padding-left: 1.5rem; /* Adiciona padding para o botão não colar na borda esquerda */
+    padding-right: 1.5rem;
+    padding-left: 1.5rem;
 }
 
-/* SELETOR CHAVE: ESTE ESTILIZA O BOTÃO "+ Novo Livro/Material" e "+ Novo Anúncio" */
 .publicacao-actions-top .publicacao-button {
-    max-width: 250px; /* Mantém a largura máxima */
+    max-width: 250px;
     font-size: 1rem;
     padding: 0.8rem 1.2rem;
-    border-radius: 8px; /* Mais arredondado */
-    font-weight: 700; /* Mais em negrito */
+    border-radius: 8px;
+    font-weight: 700;
     background-color: #216a3a;
     color: white;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); 
@@ -58,10 +51,9 @@
 
 .publicacao-actions-top .publicacao-button:hover {
     background-color: #1a512d;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Sombra maior no hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* --- Estilos do Formulário de Publicação (PublicationForm) --- */
 .publication-form-container {
     margin-bottom: 0;
     padding-bottom: 0;
@@ -162,18 +154,17 @@
     background-color: #0056b3;
 }
 
-/* ESTILO GERAL PARA BOTÕES DENTRO DE PUBLICATION FORM (ex: "Publicar Livro/Material" no modal) */
 .publication-button { 
     padding: 1rem 1.5rem;
-    border-radius: 8px; /* Aplica o mesmo arredondamento aqui */
+    border-radius: 8px;
     font-size: 1.1rem;
-    font-weight: 700; /* Aplica o mesmo negrito aqui */
+    font-weight: 700;
     cursor: pointer;
     transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
     width: 100%;
     max-width: 300px;
     align-self: center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Sombra para profundidade */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .publication-button.primary { 
@@ -182,46 +173,88 @@
 }
 .publication-button.primary:hover {
     background-color: #1a512d;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Sombra maior no hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* --- Estilos da Grade de Publicações (Livros/Anúncios) --- */
 .publicacao-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.5rem;
     margin-top: 1rem;
-    align-items: stretch; /* Garante que os cards se estiquem para ter a mesma altura na linha */
+    align-items: stretch;
 }
 
-/* --- Estilos do AnuncioCard (agora genérico para livros e anúncios) --- */
 .anuncio-card {
     background-color: #f0f0f0;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
-    /* Mantido o padding para o conteúdo interno, mas vamos ajustar margins */
     padding: 1.2rem; 
     display: flex;
     flex-direction: column;
-    gap: 0.8rem; /* Espaçamento entre os elementos do card */
+    gap: 0.8rem;
     border: 1px solid #e0e0e0;
-    
-    /* REMOÇÃO: Remova min-height e max-height diretos do .anuncio-card
-       para permitir que a altura se ajuste ao conteúdo. */
-    /* min-height: 300px; */ 
-    /* max-height: 400px; */
-    height: auto; /* Deixa a altura ser determinada pelo conteúdo */
-    
-    /* REMOÇÃO: Remova overflow: hidden AQUI! Ele estava cortando o título/conteúdo */
-    /* overflow: hidden; */ 
+    height: auto;
+    position: relative;
+    cursor: pointer; 
+}
+
+.anuncio-card:hover {
+    transform: translateY(-3px); 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); 
+}
+
+.anuncio-card-actions {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    display: flex;
+    justify-content: space-between;
+    width: calc(100% - 20px);
+    z-index: 10;
+}
+
+.anuncio-action-button {
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    pointer-events: auto;
+}
+
+.anuncio-action-button:hover {
+    background-color: #e0e0e0;
+    border-color: #a0a0a0;
+}
+
+.anuncio-action-button.edit-button {
+    margin-right: auto;
+}
+
+.anuncio-action-button.delete-button {
+    margin-left: auto;
+    background-color: rgba(255, 99, 71, 0.8);
+    border-color: #e63030;
+}
+
+.anuncio-action-button.delete-button:hover {
+    background-color: #e63030;
+    border-color: #c02626;
 }
 
 .anuncio-card-image-container {
     width: 100%;
-    height: 150px; /* Mantém a altura fixa para o contêiner da imagem */
-    overflow: hidden; /* Mantenha o overflow aqui para cortar a imagem se ela for maior */
+    height: 150px;
+    overflow: hidden;
     border-radius: 6px;
-    margin-bottom: 1rem; /* CORREÇÃO: Mais espaço entre imagem e o título */
+    margin-bottom: 1rem;
     background-color: #ddd;
     display: flex;
     justify-content: center;
@@ -237,12 +270,11 @@
 .anuncio-card-title {
     font-size: 1.3rem;
     color: #216a3a;
-    margin-bottom: 0.5rem; /* Margem padrão para o próximo elemento */
-    
-    /* CORREÇÃO: Permita que o título quebre linha. Remova text-overflow e white-space. */
-    white-space: normal; /* Permite que o texto quebre linha */
-    overflow: visible; /* Garante que o texto não seja cortado se quebrar linha */
-    text-overflow: clip; /* Ou remova esta propriedade, já que overflow não é hidden */
+    margin-top: 2rem;
+    margin-bottom: 0.5rem;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
 }
 
 .anuncio-card-type,
@@ -261,15 +293,13 @@
     font-size: 1rem;
     color: #333;
     line-height: 1.5;
-    flex-grow: 1; /* Permite que a descrição ocupe espaço flexível */
-    /* CORREÇÃO: Aumente o line-clamp para permitir mais linhas na descrição
-       e evite que o conteúdo final do card seja cortado se houver muito texto. */
+    flex-grow: 1;
     display: -webkit-box;
-    -webkit-line-clamp: 5; /* Aumentado para 5 linhas, ajuste conforme necessário */
+    -webkit-line-clamp: 5;
     -webkit-box-orient: vertical;
-    overflow: hidden; /* Mantido hidden para a descrição se ela for muito longa */
+    overflow: hidden;
     text-overflow: ellipsis;
-    margin-bottom: 0.8rem; /* Adicione margem para separar da descrição do rodapé */
+    margin-bottom: 0.8rem;
 }
 
 .anuncio-card-footer {
@@ -281,10 +311,113 @@
     border-top: 1px dashed #ddd;
     font-size: 0.85rem;
     color: #777;
-    flex-shrink: 0; /* Impede que o footer seja reduzido se houver pouco espaço */
+    flex-shrink: 0;
 }
 
-/* Media Queries para Responsividade */
+.search-bar-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: center;
+    align-items: center;
+    padding: 0 1rem;
+}
+
+.search-input {
+    flex-grow: 1;
+    max-width: 500px;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.search-button {
+    background-color: #216a3a;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.search-button:hover {
+    background-color: #1a512d;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.search-button img {
+    width: 20px;
+    height: 20px;
+    filter: invert(100%);
+}
+
+.publicacao-detail-modal {
+    max-width: 800px;
+    padding: 2rem;
+}
+
+.publicacao-detail-modal .detail-title {
+    font-size: 2rem;
+    color: #216a3a;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.publicacao-detail-modal .detail-type,
+.publicacao-detail-modal .detail-info {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 0.5rem;
+}
+
+.publicacao-detail-modal .detail-description {
+    font-size: 1.1rem;
+    color: #333;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    border-top: 1px dashed #eee;
+    padding-top: 1rem;
+}
+
+.publicacao-detail-modal .detail-photos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #eee;
+}
+
+.publicacao-detail-modal .detail-photos-grid h4 {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #216a3a;
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+}
+
+.publicacao-detail-modal .detail-photo {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.publicacao-detail-modal .no-photos-message {
+    text-align: center;
+    color: #888;
+    margin-top: 1rem;
+    font-style: italic;
+}
+
 @media (max-width: 1200px) {
     .publicacao-grid {
         grid-template-columns: repeat(3, 1fr);
@@ -334,13 +467,45 @@
         right: 10px;
     }
 
-    /* ESTILOS DE MEDIA QUERY PARA BOTÕES DE AÇÃO SUPERIOR */
     .publicacao-actions-top {
-        text-align: center; /* Centraliza o botão no mobile */
+        text-align: center;
         padding-right: 1rem;
         padding-left: 1rem;
     }
     .publicacao-actions-top .publicacao-button {
-        max-width: 100%; /* Ocupa toda a largura no mobile */
+        max-width: 100%;
+    }
+
+    .search-bar-container {
+        flex-direction: column;
+        gap: 10px;
+        padding: 0 0.5rem;
+    }
+
+    .search-input {
+        max-width: 100%;
+    }
+
+    .search-button {
+        width: 100%;
+        max-width: 200px;
+    }
+
+    .publicacao-detail-modal {
+        padding: 1rem;
+        max-width: 95%;
+        width: 100%;
+    }
+    .publicacao-detail-modal .detail-title {
+        font-size: 1.5rem;
+    }
+    .publicacao-detail-modal .detail-description {
+        font-size: 1rem;
+    }
+    .publicacao-detail-modal .detail-photos-grid {
+        grid-template-columns: 1fr;
+    }
+    .publicacao-detail-modal .detail-photo {
+        height: 200px;
     }
 }

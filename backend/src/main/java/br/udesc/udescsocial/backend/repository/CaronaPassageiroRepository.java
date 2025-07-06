@@ -7,13 +7,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional; // Import para Optional
+import java.util.Optional;
 
 @Repository
 public interface CaronaPassageiroRepository extends JpaRepository<CaronaPassageiro, CaronaPassageiroId> {
     List<CaronaPassageiro> findByCaronaId(Long caronaId);
     List<CaronaPassageiro> findByPassageiroId(Long passageiroId);
 
-    // NOVO MÉTODO: Verificar se a relação Carona-Passageiro já existe
     Optional<CaronaPassageiro> findByCaronaIdAndPassageiroId(Long caronaId, Long passageiroId);
 }

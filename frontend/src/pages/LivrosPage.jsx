@@ -1,14 +1,13 @@
-// frontend/src/pages/LivrosPage.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
-import * as anunciosService from '../services/anunciosService'; // Serviço unificado
-import AnuncioCard from '../components/AnuncioCard'; // Novo card para publicações
-import PublicationForm from '../components/PublicationForm'; // Novo formulário para publicações
+import * as anunciosService from '../services/anunciosService';
+import AnuncioCard from '../components/AnuncioCard';
+import PublicationForm from '../components/PublicationForm';
 import { useNavigate } from 'react-router-dom';
 
-import '../styles/publicacoes.css'; // Estilos para a página e cards
+import '../styles/publicacoes.css';
 import '../styles/global.css';
-import '../styles/caronas.css'; // Para o cabeçalho (reutilizando estilos)
+import '../styles/caronas.css';
 
 export default function LivrosPage() {
     const { user, loading: authLoading } = useAuth();
@@ -17,17 +16,24 @@ export default function LivrosPage() {
     const [errorPublications, setErrorPublications] = useState(null);
     const [formStatus, setFormStatus] = useState({ loading: false, error: null, success: null });
     const [showCreateModal, setShowCreateModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [currentPublication, setCurrentPublication] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const [showDetailModal, setShowDetailModal] = useState(false);
+    const [selectedAnuncio, setSelectedAnuncio] = useState(null);
 
     const navigate = useNavigate();
 
-    // Tipo de publicação específico para esta página
-    const PUBLICATION_TYPE = "MATERIAL"; // Corresponde ao tipo 'MATERIAL' no backend para livros/materiais
+    const PUBLICATION_TYPE = "MATERIAL";
 
-    const loadPublications = useCallback(async () => {
+    const emptyPublicationData = {};
+
+    const loadPublications = useCallback(async (keyword = '') => {
         setLoadingPublications(true);
         setErrorPublications(null);
         try {
-            const data = await anunciosService.fetchAnuncios(PUBLICATION_TYPE);
+            const data = await anunciosService.fetchAnuncios(PUBLICATION_TYPE, keyword);
             setPublications(data);
         } catch (err) {
             console.error("Erro ao carregar livros/materiais:", err);
@@ -35,11 +41,15 @@ export default function LivrosPage() {
         } finally {
             setLoadingPublications(false);
         }
-    }, [PUBLICATION_TYPE]); // Dependência em PUBLICATION_TYPE
+    }, [PUBLICATION_TYPE]);
 
     useEffect(() => {
-        loadPublications();
-    }, [loadPublications]);
+        loadPublications(searchTerm);
+    }, [loadPublications, searchTerm]);
+
+    const handleSearch = () => {
+        loadPublications(searchTerm);
+    };
 
     const handleCreatePublication = async (formData) => {
         if (!user || !user.id) {
@@ -50,8 +60,8 @@ export default function LivrosPage() {
         setFormStatus({ loading: true, error: null, success: null });
         try {
             const dataToSend = {
-                autorId: user.id, // Qualquer usuário logado pode publicar
-                tipo: PUBLICATION_TYPE, // Define o tipo para o backend
+                autorId: user.id,
+                tipo: PUBLICATION_TYPE,
                 titulo: formData.titulo,
                 descricao: formData.descricao,
                 local: formData.local,
@@ -60,7 +70,7 @@ export default function LivrosPage() {
             };
             await anunciosService.createAnuncio(dataToSend);
             setFormStatus({ loading: false, error: null, success: "Livro/Material publicado com sucesso!" });
-            loadPublications();
+            loadPublications(searchTerm);
             setShowCreateModal(false);
             setTimeout(() => setFormStatus({ loading: false, error: null, success: null }), 3000);
         } catch (err) {
@@ -68,8 +78,83 @@ export default function LivrosPage() {
         }
     };
 
+    const handleEditPublication = useCallback((anuncio) => {
+        setCurrentPublication(anuncio);
+        setShowEditModal(true);
+        setFormStatus({ loading: false, error: null, success: null });
+    }, []);
+
+    const handleUpdatePublication = useCallback(async (formData) => {
+        if (!user || !user.id || !currentPublication || !formData.id) {
+            alert("Erro: Dados incompletos para atualizar o livro/material.");
+            return;
+        }
+
+        setFormStatus({ loading: true, error: null, success: null });
+        try {
+            const dataToSend = {
+                id: formData.id,
+                autorId: user.id,
+                titulo: formData.titulo,
+                descricao: formData.descricao,
+                local: formData.local,
+                quantidade: formData.quantidade,
+                fotos: formData.fotos,
+            };
+            await anunciosService.updateAnuncio(formData.id, dataToSend);
+            setFormStatus({ loading: false, error: null, success: "Livro/Material atualizado com sucesso!" });
+            loadPublications(searchTerm);
+            setShowEditModal(false);
+            setCurrentPublication(null);
+            setTimeout(() => setFormStatus({ loading: false, error: null, success: null }), 3000);
+        } catch (err) {
+            setFormStatus({ loading: false, error: err.message || "Erro ao atualizar livro/material.", success: null });
+        }
+    }, [user, currentPublication, loadPublications, searchTerm]);
+
+    const handleDeletePublication = useCallback(async (anuncioId, anuncioTitle) => {
+        if (!user || !user.id) {
+            alert("Você precisa estar logado para excluir.");
+            return;
+        }
+
+        const publicationToDelete = publications.find(pub => pub.id === anuncioId);
+        if (!publicationToDelete || publicationToDelete.autor.id !== user.id) {
+            alert("Você não tem permissão para excluir este livro/material.");
+            return;
+        }
+
+        const confirmDelete = window.confirm(`Tem certeza que deseja excluir o livro/material "${anuncioTitle}"?`);
+        if (!confirmDelete) return;
+
+        setFormStatus({ loading: true, error: null, success: null });
+        try {
+            await anunciosService.deleteAnuncio(anuncioId, user.id);
+            setFormStatus({ loading: false, error: null, success: "Livro/Material excluído com sucesso!" });
+            loadPublications(searchTerm);
+            setTimeout(() => setFormStatus({ loading: false, error: null, success: null }), 3000);
+        } catch (err) {
+            setFormStatus({ loading: false, error: err.message || "Erro ao excluir livro/material.", success: null });
+        }
+    }, [user, publications, loadPublications, searchTerm]);
+
     const handleGoBack = () => {
         navigate('/home');
+    };
+
+    const handleCardClick = useCallback((anuncio) => {
+        setSelectedAnuncio(anuncio);
+        setShowDetailModal(true);
+    }, []);
+
+    const getTipoTraduzido = (tipo) => {
+        return {
+            MATERIAL: 'Material/Livro',
+            AULA: 'Aula Particular',
+            ALUGUEL: 'Aluguel',
+            EVENTO: 'Evento',
+            ANUNCIO: 'Anúncio Geral' 
+        }[tipo] || tipo; 
     };
 
     if (authLoading) {
@@ -94,7 +179,7 @@ export default function LivrosPage() {
             </header>
 
             <div className="publicacao-content-area">
-                {user && ( // Qualquer usuário logado pode criar
+                {user && (
                     <div className="publicacao-actions-top">
                         <button
                             onClick={() => setShowCreateModal(true)}
@@ -109,6 +194,24 @@ export default function LivrosPage() {
                 
                 <h2>Livros e Materiais Recentes</h2>
 
+                <div className="search-bar-container">
+                    <input
+                        type="text"
+                        placeholder="Buscar por título ou descrição..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                                handleSearch();
+                            }
+                        }}
+                        className="search-input"
+                    />
+                    <button onClick={handleSearch} className="search-button">
+                        <img src="/icons/search-icon.png" alt="Buscar" style={{ width: '20px', height: '20px' }} />
+                    </button>
+                </div>
+
                 {loadingPublications ? (
                     <div className="loading">Carregando livros e materiais...</div>
                 ) : errorPublications ? (
@@ -118,7 +221,14 @@ export default function LivrosPage() {
                 ) : (
                     <div className="publicacao-grid">
                         {publications.map((anuncio) => (
-                            <AnuncioCard key={anuncio.id} anuncio={anuncio} />
+                            <AnuncioCard 
+                                key={anuncio.id} 
+                                anuncio={anuncio} 
+                                onEdit={handleEditPublication}
+                                onDelete={handleDeletePublication}
+                                currentUser={user}
+                                onCardClick={handleCardClick} 
+                            />
                         ))}
                     </div>
                 )}
@@ -135,8 +245,60 @@ export default function LivrosPage() {
                             loading={formStatus.loading}
                             error={formStatus.error}
                             successMessage={formStatus.success}
-                            publicationType={PUBLICATION_TYPE} // Passa o tipo para o formulário
+                            publicationType={PUBLICATION_TYPE}
+                            initialData={emptyPublicationData}
+                            isEditing={false}
+                            showModal={showCreateModal}
                         />
+                    </div>
+                </div>
+            )}
+
+            {showEditModal && currentPublication && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <button className="modal-close-button" onClick={() => setShowEditModal(false)}>
+                            &times;
+                        </button>
+                        <PublicationForm
+                            onSubmit={handleUpdatePublication}
+                            loading={formStatus.loading}
+                            error={formStatus.error}
+                            successMessage={formStatus.success}
+                            publicationType={PUBLICATION_TYPE}
+                            initialData={currentPublication}
+                            isEditing={true}
+                            showModal={showEditModal}
+                        />
+                    </div>
+                </div>
+            )}
+
+            {showDetailModal && selectedAnuncio && (
+                <div className="modal-overlay">
+                    <div className="modal-content publicacao-detail-modal"> 
+                        <button className="modal-close-button" onClick={() => setShowDetailModal(false)}>
+                            &times;
+                        </button>
+                        <h3 className="detail-title">{selectedAnuncio.titulo}</h3>
+                        <p className="detail-type">Tipo: {getTipoTraduzido(selectedAnuncio.tipo)}</p>
+                        <p className="detail-description">{selectedAnuncio.descricao}</p>
+                        <p className="detail-info">Local: {selectedAnuncio.local}</p>
+                        {selectedAnuncio.quantidade && <p className="detail-info">Quantidade: {selectedAnuncio.quantidade}</p>}
+                        <p className="detail-info">Por: {selectedAnuncio.autor?.nome || 'Desconhecido'}</p>
+                        <p className="detail-info">Publicado em: {new Date(selectedAnuncio.dataPublicacao).toLocaleDateString('pt-BR')}</p>
+
+                        {selectedAnuncio.fotos && selectedAnuncio.fotos.length > 0 && (
+                            <div className="detail-photos-grid">
+                                <h4>Fotos:</h4>
+                                {selectedAnuncio.fotos.map((foto, index) => (
+                                    <img key={index} src={foto.urlImagem} alt={`Foto ${index + 1}`} className="detail-photo" />
+                                ))}
+                            </div>
+                        )}
+                        {selectedAnuncio.fotos && selectedAnuncio.fotos.length === 0 && (
+                            <p className="no-photos-message">Nenhuma foto disponível para este livro/material.</p>
+                        )}
                     </div>
                 </div>
             )}

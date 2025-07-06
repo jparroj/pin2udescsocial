@@ -1,56 +1,36 @@
-// src/main/java/br/udesc/udescsocial/backend/entity/Usuario.java
 package br.udesc.udescsocial.backend.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class Usuario {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    private String nome;
-
-    @NotBlank
-    @Email
+    @Column(nullable = false, unique = true)
     private String email;
 
-    @NotBlank
+    @Column(nullable = false)
     private String senha;
 
-    private String matricula;
+    @Column(nullable = false)
+    private String nome;
 
+    @Column(nullable = false)
     private String tipo;
 
-    // Construtores
-    public Usuario() {}
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore 
+    private Professor professor;
 
-    public Usuario(String nome, String email, String senha, String matricula, String tipo) {
-        this.nome = nome;
-        this.email = email;
-        this.senha = senha;
-        this.matricula = matricula;
-        this.tipo = tipo;
-    }
-
-    // Getters e Setters
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
     }
 
     public String getEmail() {
@@ -69,12 +49,12 @@ public class Usuario {
         this.senha = senha;
     }
 
-    public String getMatricula() {
-        return matricula;
+    public String getNome() {
+        return nome;
     }
 
-    public void setMatricula(String matricula) {
-        this.matricula = matricula;
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
     public String getTipo() {
@@ -83,5 +63,13 @@ public class Usuario {
 
     public void setTipo(String tipo) {
         this.tipo = tipo;
+    }
+
+    public Professor getProfessor() {
+        return professor;
+    }
+
+    public void setProfessor(Professor professor) {
+        this.professor = professor;
     }
 }

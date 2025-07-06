@@ -1,126 +1,160 @@
 // frontend/src/components/PublicationForm.jsx
-import React, { useState, useEffect } from 'react';
-import '../styles/publicacoes.css'; // Importa estilos específicos do formulário
+import React, { useState, useEffect, useRef } from 'react';
 
-export default function PublicationForm({ onSubmit, loading, error, successMessage, publicationType }) {
-    const [titulo, setTitulo] = useState('');
-    const [descricao, setDescricao] = useState('');
-    const [local, setLocal] = useState('');
-    const [quantidade, setQuantidade] = useState('');
-    const [fotos, setFotos] = useState([]);
+function PublicationForm({ onSubmit, loading, error, successMessage, initialData = {}, isEditing = false, showModal, publicationType }) {
+    const [titulo, setTitulo] = useState(initialData.titulo || '');
+    const [descricao, setDescricao] = useState(initialData.descricao || '');
+    const [local, setLocal] = useState(initialData.local || '');
+    const [quantidade, setQuantidade] = useState(initialData.quantidade || '');
+    const [fotos, setFotos] = useState(initialData.fotos && initialData.fotos.length > 0 ? initialData.fotos.map(f => f.urlImagem) : ['']);
 
-    // Clear form on success
+    const tituloInputRef = useRef(null);
+
     useEffect(() => {
-        if (successMessage) {
+        if (isEditing && initialData) {
+            setTitulo(initialData.titulo || '');
+            setDescricao(initialData.descricao || '');
+            setLocal(initialData.local || '');
+            setQuantidade(initialData.quantidade || '');
+            setFotos(initialData.fotos && initialData.fotos.length > 0 ? initialData.fotos.map(f => f.urlImagem) : ['']);
+        } else {
             setTitulo('');
             setDescricao('');
             setLocal('');
             setQuantidade('');
-            setFotos([]);
+            setFotos(['']); 
         }
-    }, [successMessage]);
+    }, [initialData, isEditing]);
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        // Basic frontend validation
-        if (!titulo.trim() || !descricao.trim() || !local.trim()) {
-            alert('Por favor, preencha os campos obrigatórios (Título, Descrição, Local).');
-            return;
+    useEffect(() => {
+        if (showModal && tituloInputRef.current) {
+            tituloInputRef.current.focus();
         }
+    }, [showModal]);
 
-        const fotosArray = fotos.map(f => f.trim()).filter(f => f !== '');
-        
-        const dataToSend = {
-            titulo,
-            descricao,
-            local,
-            // A quantidade só é enviada se for para livros/materiais e se tiver um valor
-            quantidade: publicationType === 'MATERIAL' && quantidade ? parseInt(quantidade, 10) : null,
-            fotos: fotosArray.length > 0 ? fotosArray : null,
-            // O autorId e o tipo serão adicionados pela página pai
-        };
-        onSubmit(dataToSend);
-    };
-
-    const handleAddPhoto = () => {
+    const handleAddPhotoField = () => {
         setFotos([...fotos, '']);
     };
 
-    const handlePhotoChange = (index, value) => {
+    const handleRemovePhotoField = (index) => {
+        const newFotos = fotos.filter((_, i) => i !== index);
+        setFotos(newFotos.length > 0 ? newFotos : ['']); 
+    };
+
+    const handlePhotoUrlChange = (index, value) => {
         const newFotos = [...fotos];
         newFotos[index] = value;
         setFotos(newFotos);
     };
 
-    const handleRemovePhoto = (index) => {
-        const newFotos = fotos.filter((_, i) => i !== index);
-        setFotos(newFotos);
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        const filteredFotos = fotos.filter(url => url.trim() !== '');
+
+        if (!titulo.trim() || !descricao.trim() || !local.trim()) {
+            alert('Por favor, preencha os campos obrigatórios (Título, Descrição, Local).');
+            return;
+        }
+
+        if (publicationType === "MATERIAL" && (!quantidade || quantidade <= 0)) {
+            alert('Por favor, preencha a quantidade para Materiais/Livros.');
+            return;
+        }
+
+        onSubmit({
+            id: isEditing ? initialData.id : null, 
+            titulo,
+            descricao,
+            local,
+            quantidade: publicationType === "MATERIAL" ? quantidade : null,
+            fotos: filteredFotos,
+        });
+
+        if (!isEditing && successMessage) {
+            setTitulo('');
+            setDescricao('');
+            setLocal('');
+            setQuantidade('');
+            setFotos(['']);
+        }
     };
 
-    const isBook = publicationType === 'MATERIAL';
+    const formKey = isEditing ? `edit-${initialData.id}` : 'create-new-publication';
 
     return (
         <div className="publication-form-container">
-            <h3>{isBook ? 'Publicar Livro/Material' : 'Criar Novo Anúncio'}</h3>
-            <form onSubmit={handleSubmit} className="publication-form">
+            <h3>{isEditing ? `Editar ${publicationType === "MATERIAL" ? 'Livro/Material' : 'Anúncio'}` : `Criar Novo ${publicationType === "MATERIAL" ? 'Livro/Material' : 'Anúncio'}`}</h3>
+            <form onSubmit={handleSubmit} className="publication-form" key={formKey}>
                 <input
                     type="text"
-                    placeholder="Título da Publicação"
+                    placeholder="Título"
                     value={titulo}
                     onChange={(e) => setTitulo(e.target.value)}
                     disabled={loading}
-                    required
+                    ref={tituloInputRef}
                 />
                 <textarea
-                    placeholder={isBook ? "Descrição do livro ou material (condição, matéria, etc.)" : "Detalhes do anúncio (o que, onde, quando)"}
+                    placeholder="Descrição"
                     value={descricao}
                     onChange={(e) => setDescricao(e.target.value)}
-                    rows="6"
+                    rows="4"
                     disabled={loading}
-                    required
                 ></textarea>
                 <input
                     type="text"
-                    placeholder={isBook ? "Local de entrega/retirada (Ex: Bloco A, Biblioteca)" : "Local do item ou evento"}
+                    placeholder="Local"
                     value={local}
                     onChange={(e) => setLocal(e.target.value)}
                     disabled={loading}
-                    required
                 />
-                {isBook && (
+                {publicationType === "MATERIAL" && (
                     <input
                         type="number"
-                        placeholder="Quantidade disponível"
+                        placeholder="Quantidade"
                         value={quantidade}
                         onChange={(e) => setQuantidade(e.target.value)}
                         disabled={loading}
                         min="1"
                     />
                 )}
-                
+
                 <div className="form-photos-section">
                     <h4>Fotos (URLs)</h4>
-                    {fotos.map((photoUrl, index) => (
+                    {fotos.map((url, index) => (
                         <div key={index} className="photo-input-group">
                             <input
                                 type="text"
                                 placeholder={`URL da Foto ${index + 1}`}
-                                value={photoUrl}
-                                onChange={(e) => handlePhotoChange(index, e.target.value)}
+                                value={url}
+                                onChange={(e) => handlePhotoUrlChange(index, e.target.value)}
                                 disabled={loading}
                             />
-                            <button type="button" onClick={() => handleRemovePhoto(index)} className="remove-photo-button" disabled={loading}>
-                                &times;
-                            </button>
+                            {fotos.length > 1 && (
+                                <button
+                                    type="button"
+                                    onClick={() => handleRemovePhotoField(index)}
+                                    className="remove-photo-button"
+                                    disabled={loading}
+                                >
+                                    &times;
+                                </button>
+                            )}
                         </div>
                     ))}
-                    <button type="button" onClick={handleAddPhoto} className="add-photo-button" disabled={loading}>
+                    <button
+                        type="button"
+                        onClick={handleAddPhotoField}
+                        className="add-photo-button"
+                        disabled={loading}
+                    >
                         + Adicionar Foto
                     </button>
                 </div>
 
                 <button type="submit" className="publication-button primary" disabled={loading}>
-                    {loading ? 'Publicando...' : (isBook ? 'Publicar Livro/Material' : 'Publicar Anúncio')}
+                    {loading ? (isEditing ? 'Atualizando...' : 'Publicando...') : (isEditing ? 'Atualizar' : 'Publicar')}
+                    {publicationType === "MATERIAL" ? ' Livro/Material' : ' Anúncio'}
                 </button>
                 {error && <p className="error-message">{error}</p>}
                 {successMessage && <p className="success-message">{successMessage}</p>}
@@ -128,3 +162,5 @@ export default function PublicationForm({ onSubmit, loading, error, successMessa
         </div>
     );
 }
+
+export default PublicationForm;

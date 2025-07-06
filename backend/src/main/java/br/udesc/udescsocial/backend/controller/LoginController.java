@@ -8,7 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List; // Necessário para listarTodosUsuarios
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/login")
@@ -24,44 +25,40 @@ public class LoginController {
     @PostMapping
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest, HttpSession session) {
         try {
-            // Validação básica dos campos
             if (loginRequest.getEmail() == null || loginRequest.getEmail().isBlank()) {
                 return ResponseEntity.badRequest()
-                    .body(new LoginResponse("O email é obrigatório", false, null, null, null)); // Adaptação para construtor
+                    .body(new LoginResponse("O email é obrigatório", false, null, null, null));
             }
 
             if (loginRequest.getSenha() == null || loginRequest.getSenha().isBlank()) {
                 return ResponseEntity.badRequest()
-                    .body(new LoginResponse("A senha é obrigatória", false, null, null, null)); // Adaptação para construtor
+                    .body(new LoginResponse("A senha é obrigatória", false, null, null, null));
             }
 
-            // Busca usuário pelo email
             Usuario usuario = repository.findByEmail(loginRequest.getEmail());
             
             if (usuario == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new LoginResponse("Credenciais inválidas", false, null, null, null)); // Adaptação para construtor
+                    .body(new LoginResponse("Credenciais inválidas", false, null, null, null));
             }
 
-            // Verifica a senha (em produção, use BCryptPasswordEncoder)
             if (!usuario.getSenha().equals(loginRequest.getSenha())) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new LoginResponse("Credenciais inválidas", false, null, null, null)); // Adaptação para construtor
+                    .body(new LoginResponse("Credenciais inválidas", false, null, null, null));
             }
 
-            // Login bem-sucedido
             session.setAttribute("usuario", usuario);
             return ResponseEntity.ok(new LoginResponse(
                 "Login bem-sucedido",
                 true,
                 usuario.getNome(),
                 usuario.getTipo(),
-                usuario.getId() // <--- Passando o ID do usuário
+                usuario.getId()
             ));
             
         } catch (Exception e) {
             return ResponseEntity.internalServerError()
-                .body(new LoginResponse("Erro no servidor: " + e.getMessage(), false, null, null, null)); // Adaptação para construtor
+                .body(new LoginResponse("Erro no servidor: " + e.getMessage(), false, null, null, null));
         }
     }
 
@@ -72,14 +69,21 @@ public class LoginController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<Usuario> getCurrentUser(HttpSession session) {
+    public ResponseEntity<UserDTO> getCurrentUser(HttpSession session) { 
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         if (usuario == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        // É uma boa prática não retornar a senha
-        usuario.setSenha(null); 
-        return ResponseEntity.ok(usuario); // Retorna o objeto Usuario, que já contém o ID
+        
+        Optional<Usuario> fullUsuarioOpt = repository.findById(usuario.getId());
+        if (fullUsuarioOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        Usuario fullUsuario = fullUsuarioOpt.get();
+
+        fullUsuario.setSenha(null); 
+
+        return ResponseEntity.ok(new UserDTO(fullUsuario)); 
     }
 
 
@@ -93,7 +97,6 @@ class LoginRequest {
     private String email;
     private String senha;
 
-    // Getters e Setters
     public String getEmail() {
         return email;
     }
@@ -111,20 +114,13 @@ class LoginRequest {
     }
 }
 
-// CLASSE LoginResponse ATUALIZADA - Mova esta classe para fora da classe LoginController
-// ou mantenha-a como uma classe interna estática se preferir, mas é bom que ela seja independente
-// ou mova para um pacote DTO separado.
-// Para fins de correção do erro, vou mantê-la como classe interna, mas com o construtor correto.
-// Idealmente, você a declararia como 'public record LoginResponse(...)' em um arquivo LoginResponse.java separado
-// no pacote 'br.udesc.udescsocial.backend.dto'.
-class LoginResponse { // <--- ESTA É A CLASSE QUE PRECISA SER ATUALIZADA NO SEU ARQUIVO!
+class LoginResponse {
     private String message;
     private boolean success;
     private String nome;
     private String tipo;
-    private Long userId; // NOVO CAMPO
+    private Long userId;
 
-    // Construtor para respostas de erro (com userId opcional, pode ser null)
     public LoginResponse(String message, boolean success, String nome, String tipo, Long userId) {
         this.message = message;
         this.success = success;
@@ -133,12 +129,10 @@ class LoginResponse { // <--- ESTA É A CLASSE QUE PRECISA SER ATUALIZADA NO SEU
         this.userId = userId;
     }
 
-    // Construtor auxiliar para casos de erro onde nome/tipo/userId não são aplicáveis
     public LoginResponse(String message, boolean success) {
         this(message, success, null, null, null);
     }
 
-    // Getters
     public String getMessage() {
         return message;
     }
@@ -155,7 +149,7 @@ class LoginResponse { // <--- ESTA É A CLASSE QUE PRECISA SER ATUALIZADA NO SEU
         return tipo;
     }
 
-    public Long getUserId() { // NOVO GETTER
+    public Long getUserId() {
         return userId;
     }
 }

@@ -1,7 +1,7 @@
 // frontend/src/components/Navbar.jsx
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import '../styles/navbar.css'; // <--- DESCOMENTE ESTA LINHA E VERIFIQUE O ARQUIVO CSS
+import '../styles/navbar.css';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -9,7 +9,7 @@ export default function Navbar() {
   return (
     <header className="navbar">
       <div className="navbar-container">
-        {/* Você pode substituir 'UDESC Social' por uma imagem de logo maior aqui, como no protótipo */}
+        {}
         <Link to="/home" className="navbar-brand"> {/* Link para home */}
           UDESC Social
         </Link>

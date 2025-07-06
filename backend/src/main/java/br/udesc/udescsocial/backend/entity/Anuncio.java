@@ -5,23 +5,23 @@ import java.time.LocalDate;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-@Entity  //indica que esta classe é uma entidade persistente que será mapeada para uma tabela no banco de dados.
+@Entity 
 public class Anuncio {
-    @Id //marca este campo como chave primária
-    @GeneratedValue(strategy = GenerationType.IDENTITY)//com estratégia IDENTITY significa que o valor será gerado automaticamente pelo banco de dados
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @ManyToOne//indica um relacionamento muitos-para-um: muitos anúncios podem pertencer a um usuário
-    @JoinColumn(name = "autor_id", nullable = false) //especifica a coluna de junção no banco de dados (autor_id) e que não pode ser nula
+    @ManyToOne
+    @JoinColumn(name = "autor_id", nullable = false)
     private Usuario autor;
     
     @Column(nullable = false)
     private String titulo;
     
     @Column(nullable = false)
-    private String tipo; // MATERIAL, AULA, ALUGUEL, EVENTO
+    private String tipo;
     
-    @Column(nullable = false, columnDefinition = "TEXT")//TEXT para a descrição permite textos longos
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String descricao;
     
     @Column(nullable = false)
@@ -32,17 +32,10 @@ public class Anuncio {
     @Column(nullable = false)
     private LocalDate dataPublicacao;
     
-
-    //@OneToMany indica que um anúncio pode ter várias fotos
-    //mappedBy especifica que o relacionamento é bidirecional, mapeado pelo campo "anuncio" na classe AnuncioFoto
-    //cascade = CascadeType.ALL significa que operações no anúncio afetam as fotos (se deletar anúncio, deleta fotos)
-    //orphanRemoval = true remove fotos "órfãs" (quando removidas da lista)
-    //@JsonIgnore evita serialização JSON infinita (quando transforma em JSON)
     @OneToMany(mappedBy = "anuncio", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference 
     private List<AnuncioFoto> fotos;
 
-    // Getters e Setters
     public Long getId() {
         return id;
     }

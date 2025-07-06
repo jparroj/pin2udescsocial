@@ -2,11 +2,10 @@
 package br.udesc.udescsocial.backend.controller;
 
 import br.udesc.udescsocial.backend.entity.Carona;
-import br.udesc.udescsocial.backend.entity.Usuario; // Importar Usuario
+import br.udesc.udescsocial.backend.entity.Usuario;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-// CaronaDTO representa uma carona para ser enviada ao frontend
 public record CaronaDTO(
     Long id,
     String origem,
@@ -15,11 +14,10 @@ public record CaronaDTO(
     LocalTime horario,
     Integer vagas,
     String descricao,
-    String ofertanteNome, // Nome do ofertante
-    Long ofertanteId,     // ID do ofertante, útil para ações futuras
-    String ofertanteTipo  // Tipo do ofertante (se necessário)
+    String ofertanteNome,
+    Long ofertanteId,
+    String ofertanteTipo
 ) {
-    // Construtor para mapear da entidade Carona para o DTO
     public CaronaDTO(Carona carona) {
         this(
             carona.getId(),
@@ -29,14 +27,13 @@ public record CaronaDTO(
             carona.getHorario(),
             carona.getVagas(),
             carona.getDescricao(),
-            carona.getOfertante() != null ? carona.getOfertante().getNome() : "Desconhecido", // Pega o nome do ofertante
+            carona.getOfertante() != null ? carona.getOfertante().getNome() : "Desconhecido",
             carona.getOfertante() != null ? carona.getOfertante().getId() : null,
             carona.getOfertante() != null ? carona.getOfertante().getTipo() : null
         );
     }
 }
 
-// OfertanteDTO para AvaliacaoCaronaDTO (se necessário)
 record OfertanteDTO(
     Long id,
     String nome
@@ -49,7 +46,6 @@ record OfertanteDTO(
     }
 }
 
-// AvaliacaoCaronaDTO para retornar avaliações formatadas
 record AvaliacaoCaronaDTO(
     Long id,
     Long caronaId,

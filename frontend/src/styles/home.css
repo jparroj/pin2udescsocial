@@ -1,15 +1,11 @@
-/* frontend/src/styles/home.css */
-
 .home-page {
     padding: 1rem;
-    /* max-width: 1200px; */ /* <--- REMOVIDO: Para ocupar a largura total da página */
     margin: 0 auto;
     background-color: #f9f9f9;
     min-height: 80vh;
-    width: 100%; /* Garante que ocupe toda a largura disponível */
+    width: 100%;
 }
 
-/* Estilos para o cabeçalho dentro da HomePage */
 .home-header {
     background: #216a3a;
     color: white;
@@ -23,13 +19,12 @@
     display: flex;
     align-items: center;
     gap: 1rem;
-    /* max-width: 960px; */ /* <--- REMOVIDO: Para que o cabeçalho se estenda na largura total */
     margin: 0 auto;
-    padding: 0 1rem; /* Adiciona padding interno para o conteúdo não colar nas bordas */
+    padding: 0 1rem;
 }
 
 .home-udesc-logo {
-    width: 180px; /* <--- AUMENTADO: Tamanho do logo da UDESC no cabeçalho (ajuste conforme necessário) */
+    width: 180px;
     height: auto;
     flex-shrink: 0;
 }
@@ -50,11 +45,9 @@
     margin: 0;
 }
 
-
-/* Estilos para a Seção de Categorias */
 .categories-section {
     margin-bottom: 2rem;
-    padding: 0 1rem; /* Adiciona padding para alinhar com o conteúdo do header */
+    padding: 0 1rem;
 }
 
 h2 {
@@ -101,27 +94,21 @@ h2 {
     font-size: 1rem;
 }
 
-
-/* Estilos para a Seção de Recomendações */
 .recommendations-section {
     margin-bottom: 2rem;
-    padding: 0 1rem; /* Adiciona padding para alinhar com o conteúdo do header */
+    padding: 0 1rem;
 }
 
 .recommendations-container {
-    /* MUDANÇA: Usar grid para ocupar o espaço e manter a responsividade */
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* <--- Permite que os cards se adaptem e preencham a linha */
-    gap: 1.5rem; /* Espaçamento entre os cards */
-    /* Removido overflow-x: auto; e nowrap para que os cards quebrem em múltiplas linhas */
-    /* Removido -webkit-overflow-scrolling e scrollbar-width */
-    padding-bottom: 0; /* Não precisa de padding extra para scrollbar */
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    padding-bottom: 0;
 }
 
-/* Estilos para a Seção de Últimos Anúncios */
 .recent-announcements {
     margin-bottom: 2rem;
-    padding: 0 1rem; /* Adiciona padding para alinhar com o conteúdo do header */
+    padding: 0 1rem;
 }
 
 .announcements-grid {
@@ -130,7 +117,6 @@ h2 {
     gap: 1.5rem;
 }
 
-/* Estilos de estado */
 .loading, .error {
     text-align: center;
     padding: 2rem;
@@ -144,9 +130,8 @@ h2 {
     margin: 1rem 0;
 }
 
-
 .logout-button {
-    background-color: #d9534f; /* Cor vermelha para indicar "sair" */
+    background-color: #d9534f;
     color: white;
     padding: 0.7rem 1.2rem;
     border: none;
@@ -155,34 +140,33 @@ h2 {
     font-size: 1rem;
     font-weight: bold;
     transition: background-color 0.2s ease;
-    margin-left: auto; /* Empurra o botão para a direita no cabeçalho */
+    margin-left: auto;
 }
 
 .logout-button:hover {
-    background-color: #c9302c; /* Escurece um pouco ao passar o mouse */
+    background-color: #c9302c;
 }
 
-/* Media Queries para Responsividade */
 @media (max-width: 768px) {
     .home-header {
         border-radius: 0;
     }
     .home-header-content {
-        padding: 0 0.5rem; /* Menos padding em telas pequenas */
+        padding: 0 0.5rem;
     }
     .home-udesc-logo {
-        width: 90px; /* Logo um pouco menor em telas pequenas */
+        width: 90px;
     }
     .home-user-name {
         font-size: 1.5rem;
     }
     .categories-section, .recommendations-section, .recent-announcements {
-        padding: 0 0.5rem; /* Menos padding lateral nas seções */
+        padding: 0 0.5rem;
     }
     .category-grid {
         grid-template-columns: repeat(2, 1fr);
     }
-    .announcements-grid, .recommendations-container { /* Recomendações também em uma coluna se minmax for menor */
+    .announcements-grid, .recommendations-container {
         grid-template-columns: 1fr;
     }
     .logout-button {

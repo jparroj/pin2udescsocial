@@ -1,10 +1,9 @@
 // frontend/src/services/apiService.js
 
-// Única base para todos os endpoints da API
 const API_BASE_URL = '/api'; 
 
 export const fetchHomeData = async () => {
-    const response = await fetch(`${API_BASE_URL}/home`, { // Gera /api/home
+    const response = await fetch(`${API_BASE_URL}/home`, { 
         credentials: 'include'
     });
     if (!response.ok) {
@@ -16,7 +15,7 @@ export const fetchHomeData = async () => {
 
 export const fetchRecommendations = async (quantidade = 4) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/home/recommendations?quantidadeRecomendacoes=${quantidade}`, { // Gera /api/home/recommendations
+        const response = await fetch(`${API_BASE_URL}/home/recommendations?quantidadeRecomendacoes=${quantidade}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -38,7 +37,7 @@ export const fetchRecommendations = async (quantidade = 4) => {
 
 export const fetchAnnouncements = async (params = {}) => {
     const query = new URLSearchParams(params).toString();
-    const response = await fetch(`${API_BASE_URL}/anuncios?${query}`, { // Gera /api/anuncios
+    const response = await fetch(`${API_BASE_URL}/anuncios?${query}`, {
         credentials: 'include'
     });
     if (!response.ok) {
@@ -49,7 +48,7 @@ export const fetchAnnouncements = async (params = {}) => {
 };
 
 export const createAnnouncement = async (announcementData) => {
-    const response = await fetch(`${API_BASE_URL}/anuncios`, { // Gera /api/anuncios
+    const response = await fetch(`${API_BASE_URL}/anuncios`, { 
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

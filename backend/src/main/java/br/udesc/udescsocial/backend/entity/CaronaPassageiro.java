@@ -28,7 +28,6 @@ public class CaronaPassageiro {
     @JoinColumn(name = "passageiro_id")
     private Usuario passageiro;
 
-    // Getters e Setters
     public CaronaPassageiroId getId() {
         return id;
     }

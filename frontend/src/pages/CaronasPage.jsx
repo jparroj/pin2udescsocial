@@ -1,15 +1,14 @@
-// frontend/src/pages/CaronasPage.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import * as caronasService from '../services/caronasService';
 import CaronaCard from '../components/CaronaCard';
+import CaronaForm from '../components/CaronaForm';
 import { useNavigate } from 'react-router-dom';
 
 import '../styles/caronas.css';
 import '../styles/cards.css';
 
-// Componentes das abas (permanecem os mesmos)
-const ProcurarCaronaTab = ({ onSearch, searchResults, loading, error, onJoinCarona }) => {
+const ProcurarCaronaTab = ({ onSearch, searchResults, loading, error, onJoinCarona, onEditCarona, onDeleteCarona, currentUser }) => {
     const [origem, setOrigem] = useState('');
     const [destino, setDestino] = useState('');
     const [data, setData] = useState('');
@@ -34,7 +33,14 @@ const ProcurarCaronaTab = ({ onSearch, searchResults, loading, error, onJoinCaro
                 <div className="caronas-list-grid">
                     {searchResults.length > 0 ? (
                         searchResults.map(carona => (
-                            <CaronaCard key={carona.id} carona={carona} onJoinCarona={onJoinCarona} />
+                            <CaronaCard 
+                                key={carona.id} 
+                                carona={carona} 
+                                onJoinCarona={onJoinCarona}
+                                onEditCarona={onEditCarona} 
+                                onDeleteCarona={onDeleteCarona} 
+                                currentUser={currentUser}
+                            />
                         ))
                     ) : (
                         <p className="no-results">Nenhuma carona encontrada com os critérios.</p>
@@ -54,60 +60,6 @@ const ProcurarCaronaTab = ({ onSearch, searchResults, loading, error, onJoinCaro
     );
 };
 
-const OfertarCaronaTab = ({ onOfferCarona, offerStatus, user }) => {
-    const [origem, setOrigem] = useState('');
-    const [destino, setDestino] = useState('');
-    const [data, setData] = useState('');
-    const [horario, setHorario] = useState('');
-    const [vagas, setVagas] = useState(1);
-    const [descricao, setDescricao] = useState('');
-
-    const handleSubmitOffer = () => {
-        if (!user || !user.id) {
-            alert("Erro: Usuário não logado ou ID de usuário não disponível.");
-            return;
-        }
-        const offerData = {
-            ofertanteId: user.id,
-            origem,
-            destino,
-            data,
-            horario,
-            vagas,
-            descricao
-        };
-        onOfferCarona(offerData);
-    };
-
-    useEffect(() => {
-        if (offerStatus.success) {
-            setOrigem('');
-            setDestino('');
-            setData('');
-            setHorario('');
-            setVagas(1);
-            setDescricao('');
-        }
-    }, [offerStatus.success]);
-
-
-    return (
-        <div className="tab-content">
-            <div className="offer-form-carona">
-                <input type="text" placeholder="De onde você vai sair?" value={origem} onChange={(e) => setOrigem(e.target.value)} />
-                <input type="text" placeholder="Até aonde você vai?" value={destino} onChange={(e) => setDestino(e.target.value)} />
-                <input type="date" value={data} onChange={(e) => setData(e.target.value)} />
-                <input type="time" placeholder="Qual horário?" value={horario} onChange={(e) => setHorario(e.target.value)} />
-                <input type="number" placeholder="Quantas vagas você tem?" min="1" value={vagas} onChange={(e) => setVagas(e.target.value)} />
-                <textarea placeholder="Utilize este espaço para acrescentar mais informações sobre sua carona" value={descricao} onChange={(e) => setDescricao(e.target.value)}></textarea>
-                <button onClick={handleSubmitOffer} className="carona-button primary">Oferecer carona</button>
-            </div>
-            {offerStatus.loading && <div className="loading">Oferecendo carona...</div>}
-            {offerStatus.success && <div className="success-message">Carona ofertada com sucesso!</div>}
-            {offerStatus.error && <div className="error">{offerStatus.error}</div>}
-        </div>
-    );
-};
 
 const AvaliacoesCaronaTab = ({ userId }) => {
     const [activeTab, setActiveTab] = useState('recebidas');
@@ -182,47 +134,71 @@ const AvaliacoesCaronaTab = ({ userId }) => {
     );
 };
 
-// Componente principal CaronasPage
 export default function CaronasPage() {
     const { user } = useAuth();
     const [activeTab, setActiveTab] = useState('procurar');
     const [searchResults, setSearchResults] = useState(null);
-    const [loadingAllCaronas, setLoadingAllCaronas] = useState(false);
-    const [errorAllCaronas, setErrorAllCaronas] = useState(null);
-    const [offerStatus, setOfferStatus] = useState({ loading: false, success: false, error: null });
+    const [loadingCaronas, setLoadingCaronas] = useState(false);
+    const [errorCaronas, setErrorCaronas] = useState(null); 
+    const [formStatus, setFormStatus] = useState({ loading: false, error: null, success: null });
+    const [showOfferModal, setShowOfferModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [currentCarona, setCurrentCarona] = useState(null);
 
     const navigate = useNavigate();
 
+    const emptyCaronaData = {};
+
+    const loadAllAvailableCaronas = useCallback(async () => {
+        setLoadingCaronas(true);
+        setErrorCaronas(null);
+        try {
+            const data = await caronasService.fetchAllCaronas();
+            setSearchResults(data);
+        } catch (err) {
+            console.error("Erro ao carregar todas as caronas:", err);
+            setErrorCaronas(err.message || "Erro ao carregar todas as caronas disponíveis.");
+            setSearchResults([]);
+        } finally {
+            setLoadingCaronas(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (activeTab === 'procurar') {
+            loadAllAvailableCaronas();
+        }
+    }, [activeTab, loadAllAvailableCaronas]);
+
+
     const handleSearch = async (origem, destino, data) => {
-        setLoadingAllCaronas(true);
-        setErrorAllCaronas(null);
+        setLoadingCaronas(true);
+        setErrorCaronas(null);
         try {
             const results = await caronasService.searchCaronas(origem, destino, data);
             setSearchResults(results);
         } catch (err) {
-            setErrorAllCaronas(err.message || "Erro ao procurar caronas.");
+            setErrorCaronas(err.message || "Erro ao procurar caronas.");
             setSearchResults([]);
         } finally {
-            setLoadingAllCaronas(false);
+            setLoadingCaronas(false);
         }
     };
 
-    const handleOfferCarona = async (caronaData) => {
-        setOfferStatus({ loading: true, success: false, error: null });
+    const handleOfferCarona = useCallback(async (caronaData) => {
+        setFormStatus({ loading: true, error: null, success: null });
         try {
             await caronasService.offerCarona(caronaData);
-            setOfferStatus({ loading: false, success: true, error: null });
+            setFormStatus({ loading: false, error: null, success: "Carona ofertada com sucesso!" });
             alert("Carona ofertada com sucesso!");
-            setLoadingAllCaronas(true);
-            setErrorAllCaronas(null);
-            const updatedCaronas = await caronasService.fetchAllCaronas();
-            setSearchResults(updatedCaronas);
-            setLoadingAllCaronas(false);
+            loadAllAvailableCaronas();
+            setShowOfferModal(false);
+            setTimeout(() => setFormStatus({ loading: false, error: null, success: null }), 3000);
         } catch (err) {
-            setOfferStatus({ loading: false, success: false, error: err.message || "Erro ao ofertar carona." });
+            setFormStatus({ loading: false, error: err.message || "Erro ao ofertar carona." });
             alert(`Erro ao ofertar carona: ${err.message}`);
         }
-    };
+    }, [loadAllAvailableCaronas]);
 
     const handleJoinCarona = async (caronaId, currentUserId) => {
         if (!currentUserId) {
@@ -232,45 +208,90 @@ export default function CaronasPage() {
         try {
             await caronasService.addPassenger(caronaId, currentUserId);
             alert("Você entrou na carona com sucesso!");
-            setLoadingAllCaronas(true);
-            setErrorAllCaronas(null);
-            const updatedCaronas = await caronasService.fetchAllCaronas();
-            setSearchResults(updatedCaronas);
-            setLoadingAllCaronas(false);
+            loadAllAvailableCaronas();
         } catch (err) {
             alert(`Erro ao entrar na carona: ${err.message}`);
         }
     };
 
-    // Função para voltar para a HomePage (será usada pelo botão no cabeçalho)
+    const handleEditCarona = useCallback((carona) => {
+        setCurrentCarona(carona);
+        setShowEditModal(true);
+        setFormStatus({ loading: false, error: null, success: null });
+    }, []);
+
+    const handleUpdateCarona = useCallback(async (formData) => {
+        if (!user || !user.id || !currentCarona || !formData.id) {
+            alert("Erro: Dados incompletos para atualizar a carona.");
+            return;
+        }
+        if (user.id !== formData.ofertanteId) { 
+             alert("Você não tem permissão para editar esta carona.");
+             return;
+        }
+
+        setFormStatus({ loading: true, error: null, success: null });
+        try {
+            await caronasService.updateCarona(formData.id, formData); 
+            setFormStatus({ loading: false, error: null, success: "Carona atualizada com sucesso!" });
+            alert("Carona atualizada com sucesso!");
+            loadAllAvailableCaronas(); 
+            setShowEditModal(false);
+            setCurrentCarona(null);
+            setTimeout(() => setFormStatus({ loading: false, error: null, success: null }), 3000);
+        } catch (err) {
+            setFormStatus({ loading: false, error: err.message || "Erro ao atualizar carona." });
+            alert(`Erro ao atualizar carona: ${err.message}`);
+        }
+    }, [user, currentCarona, loadAllAvailableCaronas]);
+
+    const handleDeleteCarona = useCallback(async (caronaId, origem, destino) => {
+        if (!user || !user.id) {
+            alert("Você precisa estar logado para excluir.");
+            return;
+        }
+
+        const caronaToDelete = searchResults.find(carona => carona.id === caronaId);
+        if (!caronaToDelete || caronaToDelete.ofertanteId !== user.id) {
+            alert("Você não tem permissão para excluir esta carona.");
+            return;
+        }
+
+        const confirmDelete = window.confirm(`Tem certeza que deseja excluir a carona de "${origem}" para "${destino}"?`);
+        if (!confirmDelete) return;
+
+        setFormStatus({ loading: true, error: null, success: null });
+        try {
+            await caronasService.deleteCarona(caronaId, user.id); 
+            setFormStatus({ loading: false, error: null, success: "Carona excluída com sucesso!" });
+            alert("Carona excluída com sucesso!");
+            loadAllAvailableCaronas(); 
+            setTimeout(() => setFormStatus({ loading: false, error: null, success: null }), 3000);
+        } catch (err) {
+            setFormStatus({ loading: false, error: err.message || "Erro ao excluir carona." });
+            alert(`Erro ao excluir carona: ${err.message}`);
+        }
+    }, [user, searchResults, loadAllAvailableCaronas]); 
+
+
     const handleGoBack = () => {
-        navigate('/home'); // Volta para a rota da HomePage
+        navigate('/home');
     };
-
-
 
     return (
         <div className="caronas-page">
             <header className="caronas-header">
                 <div className="caronas-header-content">
-                    {/* Botão de Voltar e Logo UDESC no canto esquerdo */}
                     <div className="left-header-group">
                         <button onClick={handleGoBack} className="back-button">
                             <img src="/icons/arrow-left.png" alt="Voltar" style={{ width: '24px', height: '24px' }} />
                         </button>
                         <img src="/udesc-logo.png" alt="UDESC Logo" className="home-udesc-logo" />
                     </div>
-
-                    {/* Título da Página - Centralizado */}
                     <div className="home-header-text">
                         <p className="home-welcome-greeting">Caronas</p>
                     </div>
-
-                    {/* O lado direito do cabeçalho ficará vazio. A classe 'right-header-group'
-                        será mantida para balancear o layout, com um min-width equivalente ao lado esquerdo. */}
-                    <div className="right-header-group">
-                        {/* Conteúdo vazio aqui */}
-                    </div>
+                    <div className="right-header-group"></div>
                 </div>
             </header>
 
@@ -280,7 +301,7 @@ export default function CaronasPage() {
                         <img src="/icons/search-icon.png" alt="Procurar" className="tab-icon" />
                         Procurar
                     </button>
-                    <button onClick={() => setActiveTab('ofertar')} className={`tab-button ${activeTab === 'ofertar' ? 'active' : ''}`}>
+                    <button onClick={() => setShowOfferModal(true)} className={`tab-button ${activeTab === 'ofertar' ? 'active' : ''}`}>
                         <img src="/icons/plus-icon.png" alt="Oferecer" className="tab-icon" />
                         Oferecer
                     </button>
@@ -294,20 +315,55 @@ export default function CaronasPage() {
                     <ProcurarCaronaTab
                         onSearch={handleSearch}
                         searchResults={searchResults}
-                        loading={loadingAllCaronas}
-                        error={errorAllCaronas}
+                        loading={loadingCaronas}
+                        error={errorCaronas}
                         onJoinCarona={(caronaId) => handleJoinCarona(caronaId, user?.id)}
+                        onEditCarona={handleEditCarona} 
+                        onDeleteCarona={handleDeleteCarona} 
+                        currentUser={user} 
                     />
                 )}
-                {activeTab === 'ofertar' && (
-                    <OfertarCaronaTab
-                        onOfferCarona={handleOfferCarona}
-                        offerStatus={offerStatus}
-                        user={user}
-                    />
+                {showOfferModal && (
+                    <div className="modal-overlay">
+                        <div className="modal-content">
+                            <button className="modal-close-button" onClick={() => setShowOfferModal(false)}>
+                                &times;
+                            </button>
+                            <CaronaForm
+                                onSubmit={handleOfferCarona}
+                                loading={formStatus.loading}
+                                error={formStatus.error}
+                                successMessage={formStatus.success}
+                                initialData={emptyCaronaData}
+                                isEditing={false}
+                                showModal={showOfferModal}
+                                user={user}
+                            />
+                        </div>
+                    </div>
                 )}
                 {activeTab === 'avaliacoes' && (
                     <AvaliacoesCaronaTab userId={user?.id} />
+                )}
+
+                {showEditModal && currentCarona && (
+                    <div className="modal-overlay">
+                        <div className="modal-content">
+                            <button className="modal-close-button" onClick={() => setShowEditModal(false)}>
+                                &times;
+                            </button>
+                            <CaronaForm
+                                onSubmit={handleUpdateCarona}
+                                loading={formStatus.loading}
+                                error={formStatus.error}
+                                successMessage={formStatus.success}
+                                initialData={currentCarona}
+                                isEditing={true}
+                                showModal={showEditModal}
+                                user={user}
+                            />
+                        </div>
+                    </div>
                 )}
             </div>
         </div>

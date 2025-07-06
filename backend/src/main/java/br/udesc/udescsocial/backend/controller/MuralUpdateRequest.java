@@ -1,9 +1,13 @@
+// backend/src/main/java/br/udesc/udescsocial/backend/controller/MuralUpdateRequest.java
 package br.udesc.udescsocial.backend.controller;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public record MuralRequest(
+public record MuralUpdateRequest(
+    @NotNull(message = "ID da publicação é obrigatório para atualização")
+    Long id,
+
     @NotNull(message = "Autor (Professor) é obrigatório")
     Long autorId,
 
@@ -16,4 +20,3 @@ public record MuralRequest(
     @NotBlank(message = "Categoria é obrigatória")
     String categoria
 ) {}
-

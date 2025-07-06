@@ -15,17 +15,14 @@ public class CaronaPassageiroId implements Serializable {
     private Long caronaId;
     private Long passageiroId;
 
-    // Construtor padrão necessário para JPA
     public CaronaPassageiroId() {
     }
 
-    // Construtor com parâmetros
     public CaronaPassageiroId(Long caronaId, Long passageiroId) {
         this.caronaId = caronaId;
         this.passageiroId = passageiroId;
     }
 
-    // Getters e Setters
     public Long getCaronaId() {
         return caronaId;
     }

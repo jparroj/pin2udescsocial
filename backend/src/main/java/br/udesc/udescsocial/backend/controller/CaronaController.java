@@ -18,6 +18,7 @@ import jakarta.validation.constraints.NotBlank;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -46,7 +47,6 @@ public class CaronaController {
         this.avaliacaoCaronaRepository = avaliacaoCaronaRepository;
     }
 
-    // Ofertar carona (ID 07 do backlog) - Retorna CaronaDTO
     @PostMapping("/ofertar")
     public ResponseEntity<CaronaDTO> ofertarCarona(@RequestBody OfertarCaronaRequest request) {
         Optional<Usuario> ofertanteOpt = usuarioRepository.findById(request.ofertanteId());
@@ -67,7 +67,6 @@ public class CaronaController {
         return ResponseEntity.ok(new CaronaDTO(saved));
     }
 
-    // Procurar caronas (ID 06 do backlog) - Retorna lista de CaronaDTO
     @GetMapping("/procurar")
     public ResponseEntity<?> procurarCaronas(
             @RequestParam(required = false) String origem,
@@ -93,17 +92,15 @@ public class CaronaController {
         }
     }
 
-    // NOVO ENDPOINT: Listar todas as caronas disponíveis (para a aba principal)
     @GetMapping
     public ResponseEntity<List<CaronaDTO>> listarTodasCaronasDisponiveis() {
         List<Carona> caronas = caronaRepository.findByVagasGreaterThan(0);
         List<CaronaDTO> caronaDTOs = caronas.stream()
-                                            .map(CaronaDTO::new)
-                                            .collect(Collectors.toList());
+                                                .map(CaronaDTO::new)
+                                                .collect(Collectors.toList());
         return ResponseEntity.ok(caronaDTOs);
     }
 
-    // Cadastrar passageiro em carona
     @PostMapping("/{caronaId}/passageiros/{passageiroId}")
     public ResponseEntity<?> adicionarPassageiro(
             @PathVariable Long caronaId,
@@ -154,7 +151,6 @@ public class CaronaController {
         }
     }
 
-    // Avaliar carona (ID 08 do backlog) - Retorna AvaliacaoCaronaDTO
     @PostMapping("/avaliar")
     public ResponseEntity<AvaliacaoCaronaDTO> avaliarCarona(@RequestBody AvaliarCaronaRequest request) {
         Optional<Carona> caronaOpt = caronaRepository.findById(request.caronaId());
@@ -177,9 +173,8 @@ public class CaronaController {
         return ResponseEntity.ok(new AvaliacaoCaronaDTO(saved));
     }
 
-    // Listar avaliações recebidas por um usuário - CORRIGIDO O TIPO DE RETORNO
     @GetMapping("/avaliacoes/recebidas/{usuarioId}")
-    public ResponseEntity<?> getAvaliacoesRecebidas(@PathVariable Long usuarioId) { // MUDADO PARA ResponseEntity<?>
+    public ResponseEntity<?> getAvaliacoesRecebidas(@PathVariable Long usuarioId) {
         if (!usuarioRepository.existsById(usuarioId)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("Usuário não encontrado com ID: " + usuarioId);
@@ -187,25 +182,91 @@ public class CaronaController {
 
         List<AvaliacaoCarona> avaliacoes = avaliacaoCaronaRepository.findByAvaliadoId(usuarioId);
         List<AvaliacaoCaronaDTO> avaliacaoDTOs = avaliacoes.stream()
-                                                        .map(AvaliacaoCaronaDTO::new)
-                                                        .collect(Collectors.toList());
+                                                            .map(AvaliacaoCaronaDTO::new)
+                                                            .collect(Collectors.toList());
         return ResponseEntity.ok(avaliacaoDTOs);
     }
 
-    // Listar avaliações feitas por um usuário - Retorna lista de AvaliacaoCaronaDTO
     @GetMapping("/avaliacoes/feitas/{usuarioId}")
     public ResponseEntity<List<AvaliacaoCaronaDTO>> getAvaliacoesFeitas(@PathVariable Long usuarioId) {
         List<AvaliacaoCarona> avaliacoes = avaliacaoCaronaRepository.findByAvaliadorId(usuarioId);
         List<AvaliacaoCaronaDTO> avaliacaoDTOs = avaliacoes.stream()
-                                                        .map(AvaliacaoCaronaDTO::new)
-                                                        .collect(Collectors.toList());
+                                                            .map(AvaliacaoCaronaDTO::new)
+                                                            .collect(Collectors.toList());
         return ResponseEntity.ok(avaliacaoDTOs);
     }
 
-    // Criar alerta de carona (parte do ID 06 do backlog)
     @PostMapping("/alerta")
     public ResponseEntity<Void> criarAlertaCarona(@RequestBody AlertaCaronaRequest request) {
         return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}")
+    @Transactional
+    public ResponseEntity<?> atualizarCarona(@PathVariable Long id, @RequestBody AtualizarCaronaRequest request) {
+        try {
+            Optional<Carona> caronaOpt = caronaRepository.findById(id);
+            if (caronaOpt.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            Carona carona = caronaOpt.get();
+
+            if (!carona.getOfertante().getId().equals(request.ofertanteId())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Você não tem permissão para atualizar esta carona.");
+            }
+
+            if (request.origem() != null && !request.origem().isBlank()) {
+                carona.setOrigem(request.origem());
+            }
+            if (request.destino() != null && !request.destino().isBlank()) {
+                carona.setDestino(request.destino());
+            }
+            if (request.data() != null) {
+                carona.setData(request.data());
+            }
+            if (request.horario() != null) {
+                carona.setHorario(request.horario());
+            }
+            if (request.vagas() != null && request.vagas() >= 0) {
+                carona.setVagas(request.vagas());
+            }
+            if (request.descricao() != null) {
+                carona.setDescricao(request.descricao());
+            }
+
+            Carona updatedCarona = caronaRepository.save(carona);
+            return ResponseEntity.ok(new CaronaDTO(updatedCarona));
+
+        } catch (Exception ex) {
+            return ResponseEntity.internalServerError()
+                    .body("Erro ao atualizar carona: " + ex.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity<?> deletarCarona(@PathVariable Long id, @RequestParam Long ofertanteId) {
+        try {
+            Optional<Carona> caronaOpt = caronaRepository.findById(id);
+            if (caronaOpt.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            Carona carona = caronaOpt.get();
+    
+            if (!carona.getOfertante().getId().equals(ofertanteId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Você não tem permissão para deletar esta carona.");
+            }
+
+            caronaRepository.deleteById(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception ex) {
+            return ResponseEntity.internalServerError()
+                    .body("Erro ao deletar carona: " + ex.getMessage());
+        }
     }
 }
 
@@ -220,7 +281,18 @@ record OfertarCaronaRequest(
     LocalDate data,
     @NotNull(message = "Horário é obrigatório")
     LocalTime horario,
-    @Min(value = 1, message = "Deve ter pelo menos 1 vaga")
+    @Min(value = 0, message = "Vagas deve ser pelo menos 0")
+    Integer vagas,
+    String descricao
+) {}
+
+record AtualizarCaronaRequest(
+    @NotNull(message = "ID do ofertante é obrigatório")
+    Long ofertanteId, 
+    String origem,
+    String destino,
+    LocalDate data,
+    LocalTime horario,
     Integer vagas,
     String descricao
 ) {}

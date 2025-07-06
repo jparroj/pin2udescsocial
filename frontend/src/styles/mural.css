@@ -1,5 +1,3 @@
-/* frontend/src/styles/mural.css */
-
 .mural-page {
     padding: 0;
     margin: 0 auto;
@@ -14,9 +12,9 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     padding: 1.5rem;
     margin-bottom: 2rem;
-    width: calc(100% - 40px); /* Ajuste a largura para ter margem nas laterais */
-    max-width: 1200px; /* Limita a largura máxima do conteúdo principal */
-    margin: 20px auto; /* Centraliza o mural-content-area horizontalmente e adiciona margem superior */
+    width: calc(100% - 40px);
+    max-width: 1200px;
+    margin: 20px auto;
     box-sizing: border-box;
 }
 
@@ -33,8 +31,6 @@
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
     border-bottom: 1px dashed #eee;
-    /* padding-right: 0; REMOVIDO */
-    /* padding-left: 0; REMOVIDO */
 }
 
 .mural-actions-top .mural-button {
@@ -43,7 +39,6 @@
     padding: 0.8rem 1.2rem;
 }
 
-/* --- Estilos do Formulário do Mural (Existente) --- */
 .mural-form-container {
     margin-bottom: 0;
     padding-bottom: 0;
@@ -90,6 +85,8 @@
     width: 100%;
     max-width: 250px;
     align-self: center;
+    position: relative;
+    z-index: 10001 !important;
 }
 
 .mural-button.primary {
@@ -100,7 +97,6 @@
     background-color: #1a512d;
 }
 
-/* --- Estilos da Grade de Cards do Mural (INALTERADO) --- */
 .mural-publications-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -108,7 +104,6 @@
     margin-top: 1rem;
 }
 
-/* --- Estilos de Card Individual do Mural (Existente) --- */
 .mural-card {
     background-color: #f0f0f0;
     border-radius: 8px;
@@ -118,11 +113,59 @@
     flex-direction: column;
     gap: 0.8rem;
     border: 1px solid #e0e0e0;
+    position: relative;
+}
+
+.mural-card-actions {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    display: flex;
+    justify-content: space-between;
+    width: calc(100% - 20px);
+    z-index: 10;
+}
+
+.mural-action-button {
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    pointer-events: auto;
+}
+
+.mural-action-button:hover {
+    background-color: #e0e0e0;
+    border-color: #a0a0a0;
+}
+
+.edit-button-mural {
+    margin-right: auto;
+}
+
+.delete-button-mural {
+    margin-left: auto;
+    background-color: rgba(255, 99, 71, 0.8);
+    border-color: #e63030;
+}
+
+.delete-button-mural:hover {
+    background-color: #e63030;
+    border-color: #c02626;
 }
 
 .mural-card-title {
     font-size: 1.3rem;
     color: #216a3a;
+    margin-top: 2rem;
     margin-bottom: 0.5rem;
 }
 
@@ -154,7 +197,6 @@
     color: #777;
 }
 
-/* --- Estilos do Modal (Existente) --- */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -165,7 +207,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 9999 !important;
+    pointer-events: all;
 }
 
 .modal-content {
@@ -179,6 +222,8 @@
     max-height: 90vh;
     overflow-y: auto;
     box-sizing: border-box;
+    z-index: 10000 !important;
+    pointer-events: auto;
 }
 
 .modal-close-button {
@@ -197,7 +242,6 @@
     color: #333;
 }
 
-/* Mensagens de feedback (Existente) */
 .info-message,
 .no-results-message,
 .success-message,
@@ -229,13 +273,54 @@
     color: #721c24;
 }
 
+.search-bar-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: center;
+    align-items: center;
+    padding: 0 1rem;
+}
 
-/* Media Queries para Responsividade */
+.search-input {
+    flex-grow: 1;
+    max-width: 500px;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.search-button {
+    background-color: #216a3a;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.search-button:hover {
+    background-color: #1a512d;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.search-button img {
+    width: 20px;
+    height: 20px;
+    filter: invert(100%);
+}
+
 @media (max-width: 1200px) {
     .mural-publications-grid {
         grid-template-columns: repeat(3, 1fr);
     }
-    /* Remova as media queries do cabeçalho que foram duplicadas aqui */
 }
 
 @media (max-width: 768px) {
@@ -279,5 +364,24 @@
         font-size: 1.5rem;
         top: 5px;
         right: 10px;
+    }
+
+    .mural-card-title {
+        margin-top: 1.5rem;
+    }
+
+    .search-bar-container {
+        flex-direction: column;
+        gap: 10px;
+        padding: 0 0.5rem;
+    }
+
+    .search-input {
+        max-width: 100%;
+    }
+
+    .search-button {
+        width: 100%;
+        max-width: 200px;
     }
 }

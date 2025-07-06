@@ -1,10 +1,6 @@
-// frontend/src/App.jsx
-// Remova o BrowserRouter de novo, se você o adicionou de volta por engano.
-// import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; // Remova este import completo se ele tiver sido adicionado de volta.
-import { Routes, Route, Navigate } from 'react-router-dom'; // Mantenha apenas este.
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext'; 
-// import LoginPage from './pages/LoginPage'; // Remova esta importação (se você não usa mais ela para login)
-import WelcomePage from './pages/WelcomePage'; // <--- IMPORTE O SEU WELCOMEPAGE
+import WelcomePage from './pages/WelcomePage'; 
 
 import HomePage from './pages/HomePage';
 import MuralDocentesPage from './pages/MuralDocentesPage';
@@ -24,12 +20,8 @@ const PrivateRoute = ({ children }) => {
 
 function App() {
     return (
-        // O Router DEVE ESTAR APENAS NO main.jsx (ou index.js)
-        // Se você o removeu do App.jsx na última instrução, não o adicione de volta.
-        // Se ainda estiver aqui, remova-o novamente.
         <AuthProvider>
             <Routes>
-                {/* ALTERE AQUI: Use WelcomePage no lugar de LoginPage */}
                 <Route path="/login" element={<WelcomePage />} /> 
                 
                 <Route path="/" element={<Navigate to="/home" />} />

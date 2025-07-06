@@ -5,14 +5,12 @@ html, body {
   background: white;
 }
 
-/* Container principal */
 .welcome-container {
   display: flex;
   min-height: 100vh;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Lado esquerdo: info */
 .welcome-info {
   flex: 1;
   background: linear-gradient(180deg, #1c4d28, #3a7d3d);
@@ -47,7 +45,6 @@ html, body {
   font-weight: bold;
 }
 
-/* Lado direito: login */
 .welcome-login {
   flex: 1;
   padding: 3rem 4rem;
@@ -142,7 +139,6 @@ html, body {
   height: auto;
 }
 
-/* Responsividade */
 @media (max-width: 900px) {
   .welcome-container {
     flex-direction: column;

@@ -1,6 +1,3 @@
-/* frontend/src/styles/caronas.css */
-
-/* Contêiner principal da página de Caronas */
 .caronas-page {
     padding: 1rem;
     margin: 0 auto;
@@ -9,41 +6,33 @@
     width: 100%;
 }
 
-/* Cabeçalho da Página de Caronas */
 .caronas-header {
     background: #216a3a;
     color: white;
-    padding: 1rem 1rem; /* Padding vertical e horizontal para toda a área verde */
+    padding: 1rem 1rem;
     margin: -1rem -1rem 2rem -1rem;
     border-radius: 0 0 10px 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     z-index: 10;
     display: flex;
-    align-items: center; /* Centraliza verticalmente o caronas-header-content */
-    justify-content: center; /* Centraliza horizontalmente o caronas-header-content */
+    align-items: center;
+    justify-content: center;
 }
 
-
-/* Conteúdo interno do cabeçalho */
 .caronas-header .caronas-header-content {
-    width: 100%; /* Ocupa a largura total disponível dentro do padding do .caronas-header */
-    /* REMOVER max-width e margin: 0 auto; daqui */
-    display: flex; /* Torna o content um container flex */
-    align-items: center; /* Alinha itens verticalmente no centro */
-    justify-content: space-between; /* Empurra os itens para as extremidades */
-    position: relative; /* ESSENCIAL para o posicionamento absoluto do título */
-    height: auto; /* Deixa a altura ser definida pelo conteúdo */
-    /* REMOVER padding: 0 1rem; daqui, pois o pai já tem o padding lateral */
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    height: auto;
 }
 
-/* Grupo para o botão de voltar e a logo no canto esquerdo */
 .caronas-header .left-header-group {
     display: flex;
     align-items: center;
-    gap: 0.2rem; /* Espaço entre o botão e a logo */
+    gap: 0.2rem;
     flex-shrink: 0;
-    /* Remove os posicionamentos absolutos aqui, voltamos ao fluxo flexbox */
-    /* top, left, transform, etc., removidos */
     z-index: 2;
 }
 
@@ -60,7 +49,7 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    margin-right: 0.2rem; /* Espaço entre o botão e a logo */
+    margin-right: 0.2rem;
 }
 
 .caronas-header .back-button:hover {
@@ -68,12 +57,11 @@
 }
 
 .caronas-header .home-udesc-logo {
-    width: 180px; /* Tamanho da logo no cabeçalho */
+    width: 180px;
     height: auto;
     flex-shrink: 0;
 }
 
-/* Título da Página - Centralizado */
 .caronas-header .home-header-text {
     position: absolute;
     left: 50%;
@@ -92,36 +80,31 @@
     line-height: 1.2;
 }
 
-/* Grupo para o lado direito do cabeçalho (que agora estará vazio como espaçador) */
 .caronas-header .right-header-group {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     flex-shrink: 0;
-    min-width: 150px; /* AJUSTAR ESTE VALOR se necessário */
+    min-width: 150px;
     z-index: 2;
 }
 
-/* Remover regras do offer-button-header do cabeçalho, pois ele não estará mais lá */
 .caronas-header .offer-button-header {
-    display: none; /* Oculta completamente o botão de oferecer se ele estivesse no cabeçalho */
+    display: none;
 }
 .caronas-header .offer-button-header img {
-    display: none; /* Oculta a imagem também */
+    display: none;
 }
 
-
-/* Contêiner das Abas e Formulários */
 .caronas-tabs-container {
     background-color: white;
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     padding: 1.5rem;
     margin-bottom: 2rem;
-    width: 100%; /* Garante que ocupe 100% da largura do seu pai (.caronas-page) */
+    width: 100%;
 }
 
-/* Botões das Abas */
 .caronas-tab-buttons {
     display: flex;
     justify-content: space-around;
@@ -162,53 +145,49 @@
     opacity: 1;
 }
 
-/* Conteúdo das Abas */
 .tab-content {
     padding: 0;
 }
 
-/* Formulário de Busca/Oferta de Carona */
 .search-form-carona,
 .offer-form-carona {
     display: flex;
     flex-direction: column;
-    gap: 1rem; /* Aumentei o gap para maior espaçamento entre os campos */
-    margin-bottom: 1.5rem; /* Aumentei a margem inferior */
+    gap: 1rem;
+    margin-bottom: 1.5rem;
 
-    /* Centralizar o formulário e AUMENTAR a largura */
-    align-items: center; /* Centraliza os itens horizontalmente */
-    max-width: 700px; /* Aumentei a largura máxima do formulário */
+    align-items: center;
+    max-width: 700px;
     margin-left: auto;
     margin-right: auto;
-    padding: 0 1rem; /* Adiciona um padding nas laterais para telas menores */
+    padding: 0 1rem;
 }
 
 .search-form-carona input,
 .offer-form-carona input,
 .offer-form-carona textarea {
-    padding: 0.9rem; /* Aumentei o padding para deixar os campos mais altos */
+    padding: 0.9rem;
     border: 1px solid #ddd;
     border-radius: 5px;
-    font-size: 1.1rem; /* Aumentei o tamanho da fonte dos campos */
-    width: 100%; /* Isso garante que o input ocupe 100% da largura do seu PARENT (que agora tem max-width) */
-    max-width: 550px; /* Aumentei a largura máxima para os campos individuais */
+    font-size: 1.1rem;
+    width: 100%;
+    max-width: 550px;
 }
 
 .search-form-carona button,
 .carona-button {
-    padding: 1rem 1.5rem; /* Aumentei o padding para o botão ficar maior */
+    padding: 1rem 1.5rem;
     border-radius: 5px;
-    font-size: 1.1rem; /* Aumentei o tamanho da fonte do botão */
+    font-size: 1.1rem;
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.2s, color 0.2s;
     width: 100%;
 }
 
-/* Botão Procurar - dentro do formulário de busca */
 .search-form-carona button {
-    max-width: 250px; /* Aumentei a largura desejada para o botão "Procurar" */
-    align-self: center; /* Centraliza o botão dentro do Flex container pai */
+    max-width: 250px;
+    align-self: center;
 }
 
 .carona-button.primary {
@@ -228,7 +207,6 @@
     background-color: #e0e0e0;
 }
 
-/* Lista de Caronas */
 .caronas-list-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -241,16 +219,15 @@
     text-align: center;
     color: #888;
     margin-top: 1.5rem;
-    font-size: 1.1rem; /* Um pouco maior para destaque */
-    padding: 1rem; /* Aumentei o padding */
+    font-size: 1.1rem;
+    padding: 1rem;
     background-color: #f0f0f0;
     border-radius: 8px;
 
-    /* Limitar largura e centralizar */
-    max-width: 600px; /* Largura máxima desejada para a mensagem */
+    max-width: 600px;
     margin-left: auto;
     margin-right: auto;
-    width: 100%; /* Ocupa 100% da max-width */
+    width: 100%;
 }
 
 .carona-alert-section {
@@ -259,32 +236,29 @@
     padding-top: 1.5rem;
     border-top: 1px dashed #eee;
 
-    /* Centralizar e limitar largura da seção */
-    max-width: 600px; /* Largura máxima desejada para a seção */
+    max-width: 600px;
     margin-left: auto;
     margin-right: auto;
-    width: 100%; /* Ocupa 100% da max-width */
+    width: 100%;
 
-    display: flex; /* Adicionado display flex */
-    flex-direction: column; /* Coloca os itens em coluna */
-    align-items: center; /* Centraliza os itens horizontalmente */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 .carona-alert-section p {
     margin-bottom: 1rem;
     color: #555;
     font-size: 1rem;
-    line-height: 1.5; /* Melhorar legibilidade */
+    line-height: 1.5;
 }
 
-/* Botão "Criar alerta" */
 .carona-alert-section .carona-button.secondary {
-    max-width: 200px; /* Largura desejada para o botão "Criar alerta" */
-    align-self: center; /* Centraliza o botão dentro do Flex container pai */
-    padding: 0.8rem 1rem; /* Ajuste do padding */
-    font-size: 1rem; /* Ajuste do tamanho da fonte */
+    max-width: 200px;
+    align-self: center;
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
 }
 
-/* Cards de Carona */
 .carona-card {
     background-color: #f5f5f5;
     border-radius: 10px;
@@ -293,6 +267,53 @@
     display: flex;
     flex-direction: column;
     gap: 0.8rem;
+    position: relative; 
+}
+
+.carona-card-actions {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    display: flex;
+    justify-content: space-between; 
+    width: calc(100% - 20px); 
+    z-index: 10;
+}
+
+.carona-action-button {
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    pointer-events: auto; 
+}
+
+.carona-action-button:hover {
+    background-color: #e0e0e0;
+    border-color: #a0a0a0;
+}
+
+.carona-action-button.edit-button {
+    margin-right: auto; 
+}
+
+.carona-action-button.delete-button {
+    margin-left: auto; 
+    background-color: rgba(255, 99, 71, 0.8); 
+    border-color: #e63030;
+}
+
+.carona-action-button.delete-button:hover {
+    background-color: #e63030;
+    border-color: #c02626;
 }
 
 .carona-header-card {
@@ -301,6 +322,7 @@
     align-items: center;
     border-bottom: 1px solid #eee;
     padding-bottom: 0.5rem;
+    margin-top: 2rem; 
 }
 
 .carona-icon-card {
@@ -355,7 +377,7 @@
     line-height: 1.4;
 }
 
-.carona-actions {
+.carona-actions-footer { 
     margin-top: 0.5rem;
     text-align: right;
 }
@@ -369,13 +391,12 @@
     color: #0277bd;
 }
 
-/* Media Queries para responsividade */
 @media (max-width: 768px) {
     .caronas-page {
         padding: 0;
     }
     .caronas-header {
-        padding: 0.8rem 0.8rem; /* Padding lateral menor para mobile */
+        padding: 0.8rem 0.8rem;
         border-radius: 0;
         margin: 0;
         width: 100%;
@@ -384,7 +405,6 @@
     .caronas-header .caronas-header-content {
         height: auto;
     }
-    /* Mantenha o posicionamento absoluto para os grupos em mobile */
     .caronas-header .left-header-group {
         gap: 0.1rem;
     }
@@ -405,7 +425,7 @@
     }
 
     .caronas-header .right-header-group {
-        min-width: 70px; /* Ajuste para mobile, menor que desktop */
+        min-width: 70px;
     }
     .caronas-header .offer-button-header {
         display: none;
@@ -426,7 +446,6 @@
         height: 25px;
     }
 
-    /* Formulários em mobile */
     .search-form-carona, .offer-form-carona {
         gap: 0.8rem;
         max-width: 100%;
@@ -445,7 +464,6 @@
         font-size: 1rem;
     }
 
-    /* Mensagem e Alerta em mobile */
     .initial-message {
         max-width: 100%;
         font-size: 1rem;
@@ -463,5 +481,8 @@
 
     .caronas-list-grid {
         grid-template-columns: 1fr;
+    }
+    .carona-header-card {
+        margin-top: 1.5rem; 
     }
 }

@@ -24,16 +24,13 @@ public class Professor {
     @Column(nullable = false, length = 100)
     private String departamento;
 
-    // Construtor padrão
     public Professor() {}
 
-    // Construtor com campos obrigatórios
     public Professor(Usuario usuario, String departamento) {
-        setUsuario(usuario); // Usa o setter para validação
+        setUsuario(usuario);
         this.departamento = departamento;
     }
 
-    // Getters e Setters com validação
     public Long getId() {
         return id;
     }

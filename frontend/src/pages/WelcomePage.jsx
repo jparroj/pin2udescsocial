@@ -1,38 +1,33 @@
 import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext'; // <--- Importa o hook useAuth
+import { useAuth } from '../context/AuthContext'; 
 import '../styles/WelcomePage.css';
 
 export default function WelcomePage() {
     const [email, setEmail] = useState('');
     const [senha, setSenha] = useState('');
     const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false); // <--- Adiciona estado de carregamento
+    const [loading, setLoading] = useState(false); 
     
-    // Obtém a função 'login' do seu AuthContext
-    const { login } = useAuth(); // <--- Usa o hook useAuth para acessar a função de login centralizada
+    const { login } = useAuth(); 
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        setLoading(true); // Ativa o estado de carregamento
-        setError(null); // Limpa erros anteriores
+        setLoading(true); 
+        setError(null); 
 
         try {
-            // Chama a função de login do AuthContext, que por sua vez chama o authService
             await login(email, senha);
-            // Se o login for bem-sucedido, o AuthContext já cuida da navegação
             
         } catch (err) {
-            // Se houver um erro (lançado pelo AuthContext ou authService), define a mensagem de erro
             setError(err.message || 'Falha no login. Verifique seu ID e senha.');
             console.error('Erro no componente WelcomePage:', err);
         } finally {
-            setLoading(false); // Desativa o estado de carregamento
+            setLoading(false); 
         }
     };
 
     return (
         <div className="welcome-container">
-            {/* Esquerda: Apresentação */}
             <section className="welcome-info">
                 <img src="/udesc-logo.png" alt="UDESC" className="welcome-logo" />
                 <h1>UDESC SOCIAL</h1>
@@ -46,7 +41,6 @@ export default function WelcomePage() {
                 </p>
             </section>
 
-            {/* Direita: Login */}
             <section className="welcome-login">
                 <img src="/logo-udesc.png" alt="UDESC" className="login-logo" />
                 <p className="login-instruction">
@@ -61,7 +55,7 @@ export default function WelcomePage() {
                         placeholder="Digite seu email UDESC"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        disabled={loading} // <--- Desabilita o input enquanto carrega
+                        disabled={loading} 
                         required
                     />
 
@@ -72,7 +66,7 @@ export default function WelcomePage() {
                         placeholder="Digite sua senha"
                         value={senha}
                         onChange={(e) => setSenha(e.target.value)}
-                        disabled={loading} // <--- Desabilita o input enquanto carrega
+                        disabled={loading} 
                         required
                     />
 
@@ -81,9 +75,9 @@ export default function WelcomePage() {
                     <button
                         type="submit"
                         className="login-button"
-                        disabled={loading} // <--- Desabilita o botão enquanto carrega
+                        disabled={loading} 
                     >
-                        {loading ? 'ENTRANDO...' : 'ENTRAR'} {/* <--- Mostra texto de carregamento */}
+                        {loading ? 'ENTRANDO...' : 'ENTRAR'} 
                     </button>
 
                     {error && <p className="error-message">{error}</p>}

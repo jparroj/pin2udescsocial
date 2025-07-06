@@ -1,12 +1,10 @@
 // frontend/src/services/authService.js
 
-// Única base para todos os endpoints da API, incluindo autenticação
 const API_BASE_URL = '/api'; 
 
 export const login = async (email, senha) => {
     try {
         console.log("authService: Enviando requisição de login para o backend...");
-        // URL final: /api/login (se backend tiver @RequestMapping("/api/login"))
         const response = await fetch(`${API_BASE_URL}/login`, { 
             method: 'POST',
             headers: {
@@ -34,7 +32,6 @@ export const login = async (email, senha) => {
 
 export const logout = async () => {
     try {
-        // URL final: /api/login/logout (se backend tiver @RequestMapping("/api/login"))
         const response = await fetch(`${API_BASE_URL}/login/logout`, { 
             method: 'POST',
             headers: {
@@ -55,7 +52,6 @@ export const logout = async () => {
 
 export const getCurrentUser = async () => {
     try {
-        // URL final: /api/login/me (se backend tiver @RequestMapping("/api/login"))
         const response = await fetch(`${API_BASE_URL}/login/me`, { 
             method: 'GET',
             headers: {

@@ -1,37 +1,63 @@
 // frontend/src/components/MuralForm.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
-export default function MuralForm({ onSubmit, loading, error, successMessage }) {
-    const [titulo, setTitulo] = useState('');
-    const [categoria, setCategoria] = useState('');
-    const [conteudo, setConteudo] = useState('');
+function MuralForm({ onSubmit, loading, error, successMessage, initialData = {}, isEditing = false, showModal }) {
+    const [titulo, setTitulo] = useState(initialData.titulo || '');
+    const [categoria, setCategoria] = useState(initialData.categoria || '');
+    const [conteudo, setConteudo] = useState(initialData.conteudo || '');
+
+    const tituloInputRef = useRef(null);
+
+    useEffect(() => {
+        if (isEditing) {
+            setTitulo(initialData.titulo || '');
+            setCategoria(initialData.categoria || '');
+            setConteudo(initialData.conteudo || '');
+        } else {
+            setTitulo('');
+            setCategoria('');
+            setConteudo('');
+        }
+    }, [initialData, isEditing]);
+
+    useEffect(() => {
+        if (showModal && tituloInputRef.current) {
+            tituloInputRef.current.focus();
+        }
+    }, [showModal]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Validação básica no frontend
         if (!titulo.trim() || !categoria.trim() || !conteudo.trim()) {
             alert('Por favor, preencha todos os campos.');
             return;
         }
-        onSubmit({ titulo, categoria, conteudo });
-        // Limpar formulário após o envio (se houver sucesso)
-        if (successMessage) {
+        onSubmit({
+            id: isEditing ? initialData.id : null,
+            titulo,
+            categoria,
+            conteudo
+        });
+        if (!isEditing && successMessage) {
             setTitulo('');
             setCategoria('');
             setConteudo('');
         }
     };
 
+    const formKey = isEditing ? `edit-${initialData.id}` : 'create-new';
+
     return (
         <div className="mural-form-container">
-            <h3>Criar Nova Publicação</h3>
-            <form onSubmit={handleSubmit} className="mural-form">
+            <h3>{isEditing ? 'Editar Publicação' : 'Criar Nova Publicação'}</h3>
+            <form onSubmit={handleSubmit} className="mural-form" key={formKey}>
                 <input
                     type="text"
                     placeholder="Título da Publicação"
                     value={titulo}
                     onChange={(e) => setTitulo(e.target.value)}
                     disabled={loading}
+                    ref={tituloInputRef}
                 />
                 <input
                     type="text"
@@ -48,7 +74,7 @@ export default function MuralForm({ onSubmit, loading, error, successMessage }) 
                     disabled={loading}
                 ></textarea>
                 <button type="submit" className="mural-button primary" disabled={loading}>
-                    {loading ? 'Publicando...' : 'Publicar no Mural'}
+                    {loading ? (isEditing ? 'Atualizando...' : 'Publicando...') : (isEditing ? 'Atualizar Publicação' : 'Publicar no Mural')}
                 </button>
                 {error && <p className="error-message">{error}</p>}
                 {successMessage && <p className="success-message">{successMessage}</p>}
@@ -56,3 +82,5 @@ export default function MuralForm({ onSubmit, loading, error, successMessage }) 
         </div>
     );
 }
+
+export default MuralForm;

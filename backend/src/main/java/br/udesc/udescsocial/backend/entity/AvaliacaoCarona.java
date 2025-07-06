@@ -1,9 +1,3 @@
-/**
- * Classe AvaliacaoCarona
- * 
- * Author: Elian
- * Data: 2025-05-15
- */
 package br.udesc.udescsocial.backend.entity;
 
 import jakarta.persistence.*;
@@ -28,14 +22,13 @@ public class AvaliacaoCarona {
     private Usuario avaliado;
     
     @Column(nullable = false)
-    private String nota; // PÉSSIMA, RUIM, MÉDIA, BOA, EXCELENTE
+    private String nota;
     
     private String comentario;
     
     @Column(nullable = false)
     private LocalDate dataAvaliacao;
 
-    // Getters e Setters
     public Long getId() {
         return id;
     }

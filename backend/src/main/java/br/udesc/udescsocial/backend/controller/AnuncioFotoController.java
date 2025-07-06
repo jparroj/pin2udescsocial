@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 @RestController
-@RequestMapping("/anuncios/{anuncioId}/fotos")//Mapeia todas as rotas para o caminho base /anuncios/{anuncioId}/fotos
-@CrossOrigin(origins = "*")//Permite requisições de qualquer origem
+@RequestMapping("/anuncios/{anuncioId}/fotos")
+@CrossOrigin(origins = "*")
 public class AnuncioFotoController {
 
-    private final AnuncioFotoRepository fotoRepository;//Para operações com foto
-    private final AnuncioRepository anuncioRepository;//Para validar a existência dos anúncios
+    private final AnuncioFotoRepository fotoRepository;
+    private final AnuncioRepository anuncioRepository;
 
     public AnuncioFotoController(AnuncioFotoRepository fotoRepository, 
                                AnuncioRepository anuncioRepository) {
@@ -22,7 +22,7 @@ public class AnuncioFotoController {
     }
 
     
-    @PostMapping// Adicionar nova foto a um anúncio (POST /anuncios/{anuncioId}/fotos)
+    @PostMapping
     public ResponseEntity<?> adicionarFoto(
             @PathVariable Long anuncioId,
             @RequestBody NovaFotoRequest request) {
@@ -47,7 +47,7 @@ public class AnuncioFotoController {
         }
     }
 
-    @GetMapping// Listar todas as fotos de um anúncio(GET /anuncios/{anuncioId}/fotos)
+    @GetMapping
     public ResponseEntity<?> listarFotos(@PathVariable Long anuncioId) {
         try {
             if (!anuncioRepository.existsById(anuncioId)) {
@@ -64,7 +64,7 @@ public class AnuncioFotoController {
         }
     }
 
-    @GetMapping("/{fotoId}")// Obter uma foto específica (GET /anuncios/{anuncioId}/fotos/{fotoId})
+    @GetMapping("/{fotoId}")
     public ResponseEntity<?> obterFoto(
             @PathVariable Long anuncioId,
             @PathVariable Long fotoId) {
@@ -83,7 +83,7 @@ public class AnuncioFotoController {
         }
     }
 
-    @PutMapping("/{fotoId}")// Atualizar uma foto existente (PUT /anuncios/{anuncioId}/fotos/{fotoId})
+    @PutMapping("/{fotoId}")
     public ResponseEntity<?> atualizarFoto(
             @PathVariable Long anuncioId,
             @PathVariable Long fotoId,
@@ -108,7 +108,7 @@ public class AnuncioFotoController {
         }
     }
 
-    @DeleteMapping("/{fotoId}")//Remover Foto (DELETE /anuncios/{anuncioId}/fotos/{fotoId})
+    @DeleteMapping("/{fotoId}")
     public ResponseEntity<?> deletarFoto(
             @PathVariable Long anuncioId,
             @PathVariable Long fotoId) {
@@ -128,7 +128,6 @@ public class AnuncioFotoController {
         }
     }
 
-    // Records para os DTOs de request
     public record NovaFotoRequest(
         @NotBlank(message = "URL da imagem é obrigatória")
         String urlImagem

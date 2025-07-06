@@ -1,8 +1,8 @@
+// backend/src/main/java/br/udesc/udescsocial/backend/controller/AnuncioController.java
 package br.udesc.udescsocial.backend.controller;
 
 import br.udesc.udescsocial.backend.entity.*;
 import br.udesc.udescsocial.backend.repository.*;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,60 +12,64 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-@RestController//Indica que esta classe é um controller REST
-@RequestMapping("/api/anuncios")//Define que todas as rotas começam com /anuncios
-//@CrossOrigin(origins = "*")//Permite requisições de qualquer origem
+@RestController
+@RequestMapping("/api/anuncios")
 public class AnuncioController {
     
-    private final AnuncioRepository anuncioRepository;//Para operações com anúncios
-    private final UsuarioRepository usuarioRepository;// Para validar autores dos anúncios
-    private final AnuncioFotoRepository anuncioFotoRepository;//Para gerenciar fotos dos anúncios
+    private final AnuncioRepository anuncioRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final AnuncioFotoRepository anuncioFotoRepository;
     
     public AnuncioController(AnuncioRepository anuncioRepository, 
-                           UsuarioRepository usuarioRepository,
-                           AnuncioFotoRepository anuncioFotoRepository) {
+                            UsuarioRepository usuarioRepository,
+                            AnuncioFotoRepository anuncioFotoRepository) {
         this.anuncioRepository = anuncioRepository;
         this.usuarioRepository = usuarioRepository;
         this.anuncioFotoRepository = anuncioFotoRepository;
     }
     
-   @GetMapping
-public ResponseEntity<?> listarAnuncios(
-    @RequestParam(required = false) String tipo) {
-    
+    @GetMapping
+    public ResponseEntity<?> listarAnuncios(
+        @RequestParam(required = false) String tipo,
+        @RequestParam(required = false) String keyword) {
+        
         try {
-            List<Anuncio> anuncios = anuncioRepository.findWithFilters(tipo);
+            List<Anuncio> anuncios;
+            if (keyword != null && !keyword.isBlank()) {
+                anuncios = anuncioRepository.findByKeywordAndType(keyword, tipo);
+            } else {
+                anuncios = anuncioRepository.findWithFilters(tipo, null);
+            }
 
             return ResponseEntity.ok(anuncios);
             
         } catch (Exception ex) {
-        
             return ResponseEntity.internalServerError()
                     .body("Erro ao buscar anúncios: " + ex.getMessage());
         }
     }
     
-    @PostMapping// Criar novo anúncio -> POST /anuncios
+    @PostMapping
     @Transactional
     public ResponseEntity<?> criarAnuncio(@RequestBody CriarAnuncioRequest request) {
         try {
             Optional<Usuario> autorOpt = usuarioRepository.findById(request.autorId());
-            if (autorOpt.isEmpty()) {//Valida se o autor existe
+            if (autorOpt.isEmpty()) {
                 return ResponseEntity.badRequest().body("Autor não encontrado");
             }
             
-            Anuncio anuncio = new Anuncio();//Cria um novo anúncio com data atual
+            Anuncio anuncio = new Anuncio();
             anuncio.setAutor(autorOpt.get());
             anuncio.setTitulo(request.titulo());
             anuncio.setTipo(request.tipo());
             anuncio.setDescricao(request.descricao());
             anuncio.setLocal(request.local());
             anuncio.setQuantidade(request.quantidade());
-            anuncio.setDataPublicacao(LocalDate.now());//dataatual
+            anuncio.setDataPublicacao(LocalDate.now());
             
             Anuncio savedAnuncio = anuncioRepository.save(anuncio);
             
-            if (request.fotos() != null && !request.fotos().isEmpty()) {// Salvar fotos se houver
+            if (request.fotos() != null && !request.fotos().isEmpty()) {
                 for (String urlFoto : request.fotos()) {
                     if (urlFoto != null && !urlFoto.isBlank()) {
                         AnuncioFoto foto = new AnuncioFoto();
@@ -84,7 +88,7 @@ public ResponseEntity<?> listarAnuncios(
         }
     }
 
-    @GetMapping("/{id}") // Busca um anúncio específico pelo ID (GET /anuncios/{id})
+    @GetMapping("/{id}")
     public ResponseEntity<?> obterAnuncio(@PathVariable Long id) {
         Optional<Anuncio> anuncioOpt = anuncioRepository.findById(id);
         if (anuncioOpt.isEmpty()) {
@@ -93,7 +97,7 @@ public ResponseEntity<?> listarAnuncios(
         return ResponseEntity.ok(anuncioOpt.get());
     }
     
-    @GetMapping("/usuario/{usuarioId}")// Listar anúncios de um usuário específico (GET /anuncios/usuario/{usuarioId})
+    @GetMapping("/usuario/{usuarioId}")
     public ResponseEntity<?> listarAnunciosPorUsuario(@PathVariable Long usuarioId) {
         if (!usuarioRepository.existsById(usuarioId)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -104,7 +108,7 @@ public ResponseEntity<?> listarAnuncios(
         return ResponseEntity.ok(anuncios);
     }
     
-    @PutMapping("/{id}")// Atualizar anúncio (PUT /anuncios/{id})
+    @PutMapping("/{id}")
     @Transactional
     public ResponseEntity<?> atualizarAnuncio(
             @PathVariable Long id,
@@ -118,7 +122,6 @@ public ResponseEntity<?> listarAnuncios(
             
             Anuncio anuncio = anuncioOpt.get();
             
-            // Atualizar campos permitidos
             if (request.titulo() != null && !request.titulo().isBlank()) {
                 anuncio.setTitulo(request.titulo());
             }
@@ -132,12 +135,9 @@ public ResponseEntity<?> listarAnuncios(
                 anuncio.setQuantidade(request.quantidade());
             }
             
-            // Atualizar fotos se fornecido
             if (request.fotos() != null) {
-                // Primeiro remove todas as fotos existentes
                 anuncioFotoRepository.deleteByAnuncioId(id);
                 
-                // Adiciona as novas fotos
                 for (String urlFoto : request.fotos()) {
                     if (urlFoto != null && !urlFoto.isBlank()) {
                         AnuncioFoto foto = new AnuncioFoto();
@@ -157,18 +157,23 @@ public ResponseEntity<?> listarAnuncios(
         }
     }
     
-    @DeleteMapping("/{id}")//Deletar Anúncio (DELETE /anuncios/{id})
+    @DeleteMapping("/{id}")
     @Transactional
-    public ResponseEntity<?> deletarAnuncio(@PathVariable Long id) {
+    public ResponseEntity<?> deletarAnuncio(@PathVariable Long id, @RequestParam Long autorId) {
         try {
-            if (!anuncioRepository.existsById(id)) {
+            Optional<Anuncio> anuncioOpt = anuncioRepository.findById(id);
+            if (anuncioOpt.isEmpty()) {
                 return ResponseEntity.notFound().build();
             }
+
+            Anuncio anuncio = anuncioOpt.get();
+            if (!anuncio.getAutor().getId().equals(autorId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Você não tem permissão para deletar este anúncio.");
+            }
             
-            // Primeiro deleta todas as fotos associadas
             anuncioFotoRepository.deleteByAnuncioId(id);
             
-            // Depois deleta o anúncio
             anuncioRepository.deleteById(id);
             
             return ResponseEntity.noContent().build();
@@ -178,7 +183,7 @@ public ResponseEntity<?> listarAnuncios(
         }
     }
     
-    @PostMapping("/{id}/compartilhar") //Compartilhar Anúncio (POST /anuncios/{id}/compartilhar)
+    @PostMapping("/{id}/compartilhar")
     public ResponseEntity<String> compartilharAnuncio(@PathVariable Long id) {
         if (!anuncioRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
@@ -187,7 +192,6 @@ public ResponseEntity<?> listarAnuncios(
     }
 }
 
-// DTOs atualizados
 record CriarAnuncioRequest(
     @NotNull(message = "ID do autor é obrigatório")
     Long autorId,
@@ -196,8 +200,8 @@ record CriarAnuncioRequest(
     String titulo,
     
     @NotBlank(message = "Tipo é obrigatório")
-    @Pattern(regexp = "MATERIAL|AULA|ALUGUEL|EVENTO", 
-             message = "Tipo deve ser MATERIAL, AULA, ALUGUEL ou EVENTO")
+    @Pattern(regexp = "MATERIAL|AULA|ALUGUEL|EVENTO|ANUNCIO", 
+             message = "Tipo deve ser MATERIAL, AULA, ALUGUEL, EVENTO ou ANUNCIO")
     String tipo,
     
     @NotBlank(message = "Descrição é obrigatória")

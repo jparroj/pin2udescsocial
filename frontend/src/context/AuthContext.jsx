@@ -13,16 +13,12 @@ export function AuthProvider({ children }) {
     useEffect(() => {
         const checkAuthStatus = async () => {
             try {
-                // Tenta obter o usuário atual do backend (que verifica a sessão)
-                const currentUser = await getCurrentUser(); // Assume que /login/me retorna o Usuario completo (com ID)
+                const currentUser = await getCurrentUser();
                 
-                // CRÍTICO: Verifica se currentUser existe E se tem um ID.
-                // Se o backend /login/me retornar um Usuario, ele deve ter o ID.
                 if (currentUser && currentUser.id) {
-                    setUser(currentUser); // Define o usuário como o objeto completo vindo do backend
+                    setUser(currentUser); 
                     localStorage.setItem('user', JSON.stringify(currentUser));
                 } else {
-                    // Se não há usuário logado ou o objeto não tem ID, limpa e define como nulo
                     localStorage.removeItem('user');
                     setUser(null);
                 }
@@ -41,17 +37,17 @@ export function AuthProvider({ children }) {
     const login = async (email, senha) => {
         try {
             console.log("AuthContext: Iniciando processo de login para:", email);
-            const data = await authServiceLogin(email, senha); // 'data' deve ter data.userId
+            const data = await authServiceLogin(email, senha); 
 
             console.log("AuthContext: Dados recebidos do authServiceLogin:", data);
             console.log("AuthContext: data.success é:", data.success);
 
             if (data.success) {
                 const loggedUser = {
-                    id: data.userId, // <--- ESTA LINHA É CRÍTICA: Pegar o userId da resposta
+                    id: data.userId, 
                     nome: data.nome,
                     tipo: data.tipo,
-                    email: email // Manter o email, útil para o frontend
+                    email: email 
                 };
                 setUser(loggedUser);
                 localStorage.setItem('user', JSON.stringify(loggedUser));

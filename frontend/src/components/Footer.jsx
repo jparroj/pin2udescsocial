@@ -1,6 +1,6 @@
 // frontend/src/components/Footer.jsx
-import React from 'react'; // Adicionado import React, se não estava.
-import { Link } from 'react-router-dom'; // <--- ADICIONE ESTA LINHA AQUI!
+import React from 'react'; 
+import { Link } from 'react-router-dom'; 
 import '../styles/footer.css';
 
 export default function Footer() {

@@ -19,6 +19,5 @@ public interface CaronaRepository extends JpaRepository<Carona, Long> {
         @Param("destino") String destino,
         @Param("data") LocalDate data);
 
-    // NOVO MÉTODO: Para listar caronas com vagas disponíveis
     List<Carona> findByVagasGreaterThan(Integer vagas);
 }
